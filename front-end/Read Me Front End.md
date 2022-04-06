@@ -1,4 +1,4 @@
- There are 2 Templates: React and HTML5. We can use either of them.
+ There are 3 Templates: React and HTML5. We can use either of them.
  
  I'd prefer using React and have HTML5 as a rollback if we needed to, or time is limited. Though I'm not fully experienced with it, we can learn while doing lol
  
