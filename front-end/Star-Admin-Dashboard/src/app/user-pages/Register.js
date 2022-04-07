@@ -6,11 +6,12 @@ export default function Register() {
     const userNameRef = useRef()
     const emailRef = useRef()
     const passwordRef = useRef()
+    const passwordConfirmRef = useRef()
 
     return (
       <>
-      <Card>
-         <Card.Body>
+      {/* <Card>
+         <Card.Body> */}
       <div>
         <div className="d-flex align-items-center auth px-0">
           <div className="row w-100 mx-0">
@@ -23,12 +24,12 @@ export default function Register() {
                 <h6 className="font-weight-light">Signing up is easy. It only takes a few steps</h6>
                 <Form className="pt-3">
                   
-                  <Form.Group className="form-group">
-                    <Form.Control type="text" className="form-control form-control-lg" id="exampleInputUsername1" placeholder="Username"  ref={userNameRef} required/>
-                  </Form.Group>
+                <Form.Group className="form-group">
+                    <Form.Control type="email" className="form-control form-control-lg" id="InputEmail" placeholder="Email" ref={emailRef} required/>
+                </Form.Group>
 
                   <Form.Group className="form-group">
-                    <Form.Control type="email" className="form-control form-control-lg" id="exampleInputEmail1" placeholder="Email" ref={emailRef} required/>
+                    <Form.Control type="text" className="form-control form-control-lg" id="InputUserName" placeholder="Username"  ref={userNameRef} required/>
                   </Form.Group>
 
                   {/* <div className="form-group">
@@ -43,7 +44,11 @@ export default function Register() {
                   </div> */}
 
                   <Form.Group className="form-group">
-                    <Form.Control type="password" className="form-control form-control-lg" id="exampleInputPassword1" placeholder="Password" ref={passwordRef} required/>
+                    <Form.Control type="password" className="form-control form-control-lg" id="InputPassword" placeholder="Password" ref={passwordRef} required/>
+                  </Form.Group>
+
+                  <Form.Group className="form-group">
+                    <Form.Control type="password" className="form-control form-control-lg" id="InputConfirmPassword" placeholder="Cofirm Password" ref={passwordConfirmRef} required/>
                   </Form.Group>
 
                   <div className="mb-4">
@@ -69,8 +74,8 @@ export default function Register() {
           </div>
         </div>
       </div>
-      </Card.Body>
-      </Card>
+      {/* </Card.Body>
+      </Card> */}
       </>
     )
   }
