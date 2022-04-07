@@ -1,9 +1,16 @@
-import React, { Component } from 'react';
+import React, { useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { Form, Button, Card } from 'react-bootstrap'
 
-export class Register extends Component {
-  render() {
+export default function Register() {
+    const userNameRef = useRef()
+    const emailRef = useRef()
+    const passwordRef = useRef()
+
     return (
+      <>
+      <Card>
+         <Card.Body>
       <div>
         <div className="d-flex align-items-center auth px-0">
           <div className="row w-100 mx-0">
@@ -14,14 +21,17 @@ export class Register extends Component {
                 </div>
                 <h4>New here?</h4>
                 <h6 className="font-weight-light">Signing up is easy. It only takes a few steps</h6>
-                <form className="pt-3">
-                  <div className="form-group">
-                    <input type="text" className="form-control form-control-lg" id="exampleInputUsername1" placeholder="Username" />
-                  </div>
-                  <div className="form-group">
-                    <input type="email" className="form-control form-control-lg" id="exampleInputEmail1" placeholder="Email" />
-                  </div>
-                  <div className="form-group">
+                <Form className="pt-3">
+                  
+                  <Form.Group className="form-group">
+                    <Form.Control type="text" className="form-control form-control-lg" id="exampleInputUsername1" placeholder="Username"  ref={userNameRef} required/>
+                  </Form.Group>
+
+                  <Form.Group className="form-group">
+                    <Form.Control type="email" className="form-control form-control-lg" id="exampleInputEmail1" placeholder="Email" ref={emailRef} required/>
+                  </Form.Group>
+
+                  {/* <div className="form-group">
                     <select className="form-control form-control-lg" id="exampleFormControlSelect2">
                       <option>Country</option>
                       <option>United States of America</option>
@@ -30,18 +40,22 @@ export class Register extends Component {
                       <option>Germany</option>
                       <option>Argentina</option>
                     </select>
-                  </div>
-                  <div className="form-group">
-                    <input type="password" className="form-control form-control-lg" id="exampleInputPassword1" placeholder="Password" />
-                  </div>
+                  </div> */}
+
+                  <Form.Group className="form-group">
+                    <Form.Control type="password" className="form-control form-control-lg" id="exampleInputPassword1" placeholder="Password" ref={passwordRef} required/>
+                  </Form.Group>
+
                   <div className="mb-4">
-                    <div className="form-check">
-                      <label className="form-check-label text-muted">
-                        <input type="checkbox" className="form-check-input" />
+                    <Form.Group className="form-check">
+
+                      <Form.Label className="form-check-label text-muted">
+                        <Form.Control type="checkbox" className="form-check-input" />
                         <i className="input-helper"></i>
                         I agree to all Terms & Conditions
-                      </label>
-                    </div>
+                      </Form.Label>
+                    
+                    </Form.Group>
                   </div>
                   <div className="mt-3">
                     <Link className="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn" to="/dashboard">SIGN UP</Link>
@@ -49,14 +63,15 @@ export class Register extends Component {
                   <div className="text-center mt-4 font-weight-light">
                     Already have an account? <Link to="/user-pages/login" className="text-primary">Login</Link>
                   </div>
-                </form>
+                </Form>
               </div>
             </div>
           </div>
         </div>
       </div>
+      </Card.Body>
+      </Card>
+      </>
     )
   }
-}
 
-export default Register
