@@ -1,17 +1,38 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Form, Button, Card } from 'react-bootstrap'
+import { Form, Button, Alert} from 'react-bootstrap'
+import  { useAuth }  from '../contexts/AuthContext'
+import { AuthProvider } from '../contexts/AuthContext'
 
 export default function Register() {
     const userNameRef = useRef()
     const emailRef = useRef()
     const passwordRef = useRef()
     const passwordConfirmRef = useRef()
+    const { signup, currentUser } = useAuth()
+    const [error, setError] = useState('')
+    const [loading, setLoading] = useState(false)
+
+    async function handleSubmit(e){
+      e.preventDefault()
+
+      if (passwordRef.current.value !== passwordConfirmRef.current.value){
+        return setError('Passwords do not match!')
+      }
+
+      try{
+        setError('')
+        setLoading(false)
+        signup(emailRef.current.value, passwordRef.current.vale)
+      } catch {
+        setError('Failed to create an account')
+      }
+
+      setLoading(true)
+      
+    }
 
     return (
-      <>
-      {/* <Card>
-         <Card.Body> */}
       <div>
         <div className="d-flex align-items-center auth px-0">
           <div className="row w-100 mx-0">
@@ -22,15 +43,15 @@ export default function Register() {
                 </div>
                 <h4>New here?</h4>
                 <h6 className="font-weight-light">Signing up is easy. It only takes a few steps</h6>
-                <Form className="pt-3">
-                  
+                <Form className="pt-3" onSubmit={handleSubmit}>
+                  {error && <Alert variant="danger">{error}</Alert>}
                 <Form.Group className="form-group">
                     <Form.Control type="email" className="form-control form-control-lg" id="InputEmail" placeholder="Email" ref={emailRef} required/>
                 </Form.Group>
 
-                  <Form.Group className="form-group">
+                  {/* <Form.Group className="form-group">
                     <Form.Control type="text" className="form-control form-control-lg" id="InputUserName" placeholder="Username"  ref={userNameRef} required/>
-                  </Form.Group>
+                  </Form.Group> */}
 
                   {/* <div className="form-group">
                     <select className="form-control form-control-lg" id="exampleFormControlSelect2">
@@ -63,7 +84,7 @@ export default function Register() {
                     </Form.Group>
                   </div>
                   <div className="mt-3">
-                    <Link className="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn" to="/dashboard">SIGN UP</Link>
+                    <Button disabled={loading} className="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn" type="submit">SIGN UP</Button>
                   </div>
                   <div className="text-center mt-4 font-weight-light">
                     Already have an account? <Link to="/user-pages/login" className="text-primary">Login</Link>
@@ -74,9 +95,6 @@ export default function Register() {
           </div>
         </div>
       </div>
-      {/* </Card.Body>
-      </Card> */}
-      </>
     )
   }
 

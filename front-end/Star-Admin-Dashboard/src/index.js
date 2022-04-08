@@ -6,9 +6,11 @@ import "./i18n";
 import * as serviceWorker from './serviceWorker';
 
 ReactDOM.render(
+  <React.StrictMode>
   <BrowserRouter basename="/rate-my-biz">
     <App />
   </BrowserRouter>
+  </React.StrictMode>
 , document.getElementById('root'));
 
 serviceWorker.unregister();
