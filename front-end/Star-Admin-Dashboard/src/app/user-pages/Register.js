@@ -1,17 +1,16 @@
 import React, { useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { Form, Button, Alert} from 'react-bootstrap'
 import  { useAuth }  from '../contexts/AuthContext'
-import { AuthProvider } from '../contexts/AuthContext'
 
 export default function Register() {
-    const userNameRef = useRef()
     const emailRef = useRef()
     const passwordRef = useRef()
     const passwordConfirmRef = useRef()
-    const { signup, currentUser } = useAuth()
+    const { signup } = useAuth()
     const [error, setError] = useState('')
     const [loading, setLoading] = useState(false)
+    const history = useHistory()
 
     async function handleSubmit(e){
       e.preventDefault()
@@ -22,13 +21,14 @@ export default function Register() {
 
       try{
         setError('')
-        setLoading(false)
-        signup(emailRef.current.value, passwordRef.current.vale)
+        setLoading(true)
+        await signup(emailRef.current.value, passwordRef.current.value)
+        history.push('/dashboard')
       } catch {
         setError('Failed to create an account')
       }
 
-      setLoading(true)
+      setLoading(false)
       
     }
 
@@ -41,9 +41,9 @@ export default function Register() {
                 <div className="brand-logo">
                   <img src={require("../../assets/images/logo.svg")} alt="logo" />
                 </div>
-                <h4>New here?</h4>
-                <h6 className="font-weight-light">Signing up is easy. It only takes a few steps</h6>
+                <h2 className="text-center mb-4">Sign Up</h2>
                 <Form className="pt-3" onSubmit={handleSubmit}>
+                  
                   {error && <Alert variant="danger">{error}</Alert>}
                 <Form.Group className="form-group">
                     <Form.Control type="email" className="form-control form-control-lg" id="InputEmail" placeholder="Email" ref={emailRef} required/>
@@ -87,7 +87,7 @@ export default function Register() {
                     <Button disabled={loading} className="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn" type="submit">SIGN UP</Button>
                   </div>
                   <div className="text-center mt-4 font-weight-light">
-                    Already have an account? <Link to="/user-pages/login" className="text-primary">Login</Link>
+                    Already have an account? <Link to="/user-pages/login-1" className="text-primary">Login</Link>
                   </div>
                 </Form>
               </div>

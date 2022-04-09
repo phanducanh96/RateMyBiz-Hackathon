@@ -178,7 +178,7 @@ class Sidebar extends Component {
             <Collapse in={ this.state.userPagesMenuOpen }>
               <ul className="nav flex-column sub-menu">
                 <li className="nav-item"> <Link className={ this.isPathActive('/user-pages/login-1') ? 'nav-link active' : 'nav-link' } to="/user-pages/login-1"><Trans>Login</Trans></Link></li>
-                <li className="nav-item"> <Link className={ this.isPathActive('/user-pages/appsignin') ? 'nav-link active' : 'nav-link' } to="/user-pages/appsignin"><Trans>Register</Trans></Link></li>
+                <li className="nav-item"> <Link className={ this.isPathActive('/user-pages/register-1') ? 'nav-link active' : 'nav-link' } to="/user-pages/register-1"><Trans>Register</Trans></Link></li>
               </ul>
             </Collapse>
           </li>

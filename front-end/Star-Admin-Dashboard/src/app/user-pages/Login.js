@@ -1,9 +1,32 @@
-import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
-import { Form } from 'react-bootstrap';
+import React, { useRef, useState } from 'react';
+import { Link, useHistory } from 'react-router-dom';
+import { Form, Button, Alert} from 'react-bootstrap'
+import  { useAuth }  from '../contexts/AuthContext'
 
-export class Login extends Component {
-  render() {
+export default function LogIn(){
+  const emailRef = useRef()
+  const passwordRef = useRef()
+  const { login, currentUser } = useAuth()
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const history = useHistory()
+
+  async function handleSubmit(e){
+    e.preventDefault()
+
+    try{
+      setError('')
+      setLoading(true)
+      await login(emailRef.current.value, passwordRef.current.value)
+      history.push('/dashboard')
+    } catch {
+      setError('Failed to Sign In')
+    }
+
+    setLoading(false)
+    
+  }
+
     return (
       <div>
         <div className="d-flex align-items-center auth px-0">
@@ -13,17 +36,19 @@ export class Login extends Component {
                 <div className="brand-logo">
                   <img src={require("../../assets/images/logo.svg")} alt="logo" />
                 </div>
-                <h4>Hello! let's get started</h4>
-                <h6 className="font-weight-light">Sign in to continue.</h6>
-                <Form className="pt-3">
-                  <Form.Group className="d-flex search-field">
-                    <Form.Control type="email" placeholder="Username" size="lg" className="h-auto" />
+                <h2 className="text-center mb-4">Log In</h2>
+                <Form className="pt-3" onSubmit={handleSubmit}>
+                {error && <Alert variant="danger">{error}</Alert>}
+                <Form.Group className="form-group">
+                    <Form.Control type="email" className="form-control form-control-lg" id="InputEmail" placeholder="Email" ref={emailRef} required/>
+                </Form.Group>
+
+                <Form.Group className="form-group">
+                    <Form.Control type="password" className="form-control form-control-lg" id="InputPassword" placeholder="Password" ref={passwordRef} required/>
                   </Form.Group>
-                  <Form.Group className="d-flex search-field">
-                    <Form.Control type="password" placeholder="Password" size="lg" className="h-auto" />
-                  </Form.Group>
+
                   <div className="mt-3">
-                    <Link className="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn" to="/dashboard">SIGN IN</Link>
+                    <Button disabled={loading} className="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn" type="submit">LOG IN</Button>
                   </div>
                   <div className="my-2 d-flex justify-content-between align-items-center">
                     <div className="form-check">
@@ -35,13 +60,15 @@ export class Login extends Component {
                     </div>
                     <a href="!#" onClick={event => event.preventDefault()} className="auth-link text-black">Forgot password?</a>
                   </div>
-                  <div className="mb-2">
+
+                  {/* <div className="mb-2">
                     <button type="button" className="btn btn-block btn-facebook auth-form-btn">
                       <i className="mdi mdi-facebook mr-2"></i>Connect using facebook
                     </button>
-                  </div>
+                  </div> */}
+                  
                   <div className="text-center mt-4 font-weight-light">
-                    Don't have an account? <Link to="/user-pages/register" className="text-primary">Create</Link>
+                    Don't have an account? <Link to="/user-pages/register-1" className="text-primary">Sign Up</Link>
                   </div>
                 </Form>
               </div>
@@ -51,6 +78,3 @@ export class Login extends Component {
       </div>
     )
   }
-}
-
-export default Login
