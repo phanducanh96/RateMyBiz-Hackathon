@@ -4,6 +4,6 @@
  
  **Testing React**: You will need to install Node JS on your machine. Open a terminal, cd to the Template folder and enter **npm install**. You might have to do **npm audit fix**. After all of that, execute **npm start**
  
-For the new DashBoard Template I uploaded, **npm install** did not work well installing all the dependencies. Hence, I switched to **yarn**. You can install **yarn** by executing **npm install --global yarn**. Use terminal to cd to the DashBoard folder, cd to Source Files folder, then **yarn install**, **yarn start**
+For the new DashBoard Template I uploaded, **npm install** did not work well installing all the dependencies. Hence, I switched to **yarn**. You can install **yarn** by executing **npm install --global yarn**. Use terminal to cd to the Star-Admin-DashBoard folder, then **yarn install**, **yarn start**
  
  **Testing HTML5**: Just simply open the html pages
