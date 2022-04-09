@@ -1,5 +1,6 @@
 import React, { Component,Suspense, lazy } from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom';
+import PrivateRoute from "./PrivateRoute"
 
 import Spinner from '../app/shared/Spinner';
 
@@ -20,7 +21,7 @@ const Error404 = lazy(() => import('./error-pages/Error404'));
 const Error500 = lazy(() => import('./error-pages/Error500'));
 
 const Login = lazy(() => import('./user-pages/Login'));
-const Register1 = lazy(() => import('./user-pages/Register'));
+const Register = lazy(() => import('./user-pages/Register'));
 
 
 class AppRoutes extends Component {
@@ -28,7 +29,9 @@ class AppRoutes extends Component {
     return (
       <Suspense fallback={<Spinner/>}>
         <Switch>
-          <Route exact path="/dashboard" component={ Dashboard } />
+          <PrivateRoute exact path="/" component={ Dashboard } />
+
+          <PrivateRoute exact path="/dashboard" component={ Dashboard } />
 
           <Route path="/basic-ui/buttons" component={ Buttons } />
           <Route path="/basic-ui/dropdowns" component={ Dropdowns } />
@@ -42,14 +45,14 @@ class AppRoutes extends Component {
           <Route path="/charts/chart-js" component={ ChartJs } />
 
 
-          <Route path="/user-pages/login-1" component={ Login } />
-          <Route path="/user-pages/register-1" component={ Register1 } />
+          <Route path="/login" component={ Login } />
+          <Route path="/signup" component={ Register } />
 
           <Route path="/error-pages/error-404" component={ Error404 } />
           <Route path="/error-pages/error-500" component={ Error500 } />
 
 
-          <Redirect to="/dashboard" />
+          {/* <Redirect to="/user-pages/login-1" /> */}
         </Switch>
       </Suspense>
     );

@@ -1,11 +1,13 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import { Dropdown } from 'react-bootstrap';
 import { Trans } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
+import { Link, useHistory } from "react-router-dom"
 
 export default function Navbar() {
-
-  const { currentUser} = useAuth()
+  const [error, setError] = useState('')
+  const { currentUser, logout} = useAuth()
+  const history = useHistory()
 
   function toggleOffcanvas() {
     document.querySelector('.sidebar-offcanvas').classList.toggle('active');
@@ -15,8 +17,14 @@ export default function Navbar() {
     document.querySelector('.right-sidebar').classList.toggle('open');
   }
 
-  function handleLogout(){
-
+    async function handleLogout(){
+    setError('')
+    try{
+      await logout()
+      history.push('/login')
+    }catch{
+      setError('Failed to log out')
+    }
   }
 
     return (
@@ -187,7 +195,7 @@ export default function Navbar() {
                   <Dropdown.Item className="dropdown-item preview-item d-flex align-items-center border-0" onClick={evt =>evt.preventDefault()}>
                     <Trans>Check Inbox</Trans>
                   </Dropdown.Item>
-                  <Dropdown.Item className="dropdown-item preview-item d-flex align-items-center border-0" onClick={evt =>evt.preventDefault()}>
+                  <Dropdown.Item className="dropdown-item preview-item d-flex align-items-center border-0" onClick={handleLogout}>
                     <Trans>Sign Out</Trans>
                   </Dropdown.Item>
                 </Dropdown.Menu>

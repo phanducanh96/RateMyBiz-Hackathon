@@ -68,7 +68,7 @@ export default function LogIn(){
                   </div> */}
                   
                   <div className="text-center mt-4 font-weight-light">
-                    Don't have an account? <Link to="/user-pages/register-1" className="text-primary">Sign Up</Link>
+                    Don't have an account? <Link to="/signup" className="text-primary">Sign Up</Link>
                   </div>
                 </Form>
               </div>

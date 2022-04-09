@@ -87,7 +87,7 @@ export default function Register() {
                     <Button disabled={loading} className="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn" type="submit">SIGN UP</Button>
                   </div>
                   <div className="text-center mt-4 font-weight-light">
-                    Already have an account? <Link to="/user-pages/login-1" className="text-primary">Login</Link>
+                    Already have an account? <Link to="/login" className="text-primary">Login</Link>
                   </div>
                 </Form>
               </div>
