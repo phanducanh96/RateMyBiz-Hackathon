@@ -7,13 +7,11 @@ import * as serviceWorker from './serviceWorker';
 import { AuthProvider } from "./app/contexts/AuthContext";
 
 ReactDOM.render(
-  <React.StrictMode>
   <BrowserRouter basename="/rate-my-biz">
     <AuthProvider>
       <App />
     </AuthProvider>
   </BrowserRouter>
-  </React.StrictMode>
 , document.getElementById('root'));
 
 serviceWorker.unregister();

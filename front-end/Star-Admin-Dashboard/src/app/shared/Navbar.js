@@ -1,15 +1,24 @@
 import React, { Component } from 'react';
 import { Dropdown } from 'react-bootstrap';
 import { Trans } from 'react-i18next';
+import { useAuth } from '../contexts/AuthContext';
 
-class Navbar extends Component {
-  toggleOffcanvas() {
+export default function Navbar() {
+
+  const { currentUser} = useAuth()
+
+  function toggleOffcanvas() {
     document.querySelector('.sidebar-offcanvas').classList.toggle('active');
   }
-  toggleRightSidebar() {
+
+  function toggleRightSidebar() {
     document.querySelector('.right-sidebar').classList.toggle('open');
   }
-  render () {  
+
+  function handleLogout(){
+
+  }
+
     return (
       <nav className="navbar col-lg-12 col-12 p-lg-0 fixed-top d-flex flex-row">
         <div className="navbar-menu-wrapper d-flex align-items-center justify-content-between">
@@ -153,7 +162,7 @@ class Navbar extends Component {
             <li className="nav-item  nav-profile border-0">
               <Dropdown>
                 <Dropdown.Toggle className="nav-link count-indicator bg-transparent">
-                  <img className="img-xs rounded-circle" src={require("../../assets/images/faces/face8.jpg")} alt="Profile" />
+                  <img className="img-xs rounded-circle" src={require("../../assets/images/faces/evil-jake.jpg")} alt="Profile" />
                 </Dropdown.Toggle>
                 <Dropdown.Menu className="preview-list navbar-dropdown pb-3">
                   <Dropdown.Item className="dropdown-item p-0 preview-item d-flex align-items-center border-bottom" href="!#" onClick={evt =>evt.preventDefault()}>
@@ -185,13 +194,10 @@ class Navbar extends Component {
               </Dropdown>
             </li>
           </ul>
-          <button className="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" onClick={this.toggleOffcanvas}>
+          <button className="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" onClick={toggleOffcanvas}>
             <span className="mdi mdi-menu"></span>
           </button>
         </div>
       </nav>
     );
   }
-}
-
-export default Navbar;
