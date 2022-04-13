@@ -24,6 +24,7 @@ const Login = lazy(() => import('./user-pages/Login'));
 const Register = lazy(() => import('./user-pages/Register'));
 const Profile = lazy(() => import('./user-profile/Profile'));
 
+const FlaskTest = lazy(() => import('./test/flask'))
 
 class AppRoutes extends Component {
 
@@ -55,6 +56,7 @@ class AppRoutes extends Component {
           <Route path="/error-pages/error-404" component={Error404} />
           <Route path="/error-pages/error-500" component={Error500} />
 
+          <Route path="/flask-test" component={ FlaskTest } />
 
           {/* <Redirect to="/user-pages/login-1" /> */}
         </Switch>
