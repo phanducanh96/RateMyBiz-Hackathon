@@ -2,7 +2,7 @@ from flask import Flask
 
 api = Flask(__name__)
 
-@api.route('/', methods=["POST"])
+@api.route('/profile', methods=["GET"])
 def my_profile():
 	response_body = {
 		"name": "Nagato",

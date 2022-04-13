@@ -4,28 +4,24 @@ import axios from "axios";
 class Flask extends Component {
 	constructor(props) {
 		super(props);
-		this.state = {
-			profileData: {
-				name: "",
-				about: ""
-			}
-		}
+		this.state = null;
 	}
 	
 	render() {
 		return (
 			<div className="App">
-				<p>To get your profile details: </p><button onClick={this.getData()}>Click me</button>
-				<div>
-							<p>Profile name: {this.state.profileData.name}</p>
-							<p>About me: {this.state.profileData.about}</p>
-				</div>
+				<p>To get your profile details: </p><button onClick={() => this.getData()}>Click me</button>
+        {this.state !== null && <div>
+              <p>Profile name: {this.state.profileData.name}</p>
+              <p>About me: {this.state.profileData.about}</p>
+            </div>
+        }
 			</div>
 		);
 	}
 
 	getData() {
-			axios.get('/')
+			axios.get('/profile')
 			.then((response) => {
 				console.log(response.data)
 				this.setState({
