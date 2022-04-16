@@ -5,7 +5,7 @@
             "./build/contracts"
         ],
         "routes": {
-            "/vendor": "./node_modules"
+            "/vendor": "./../../node_modules"
         }
     }
 }

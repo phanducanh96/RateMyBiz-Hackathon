@@ -116,7 +116,7 @@
   "sourceMap": "61:715:2:-:0;;;113:1;84:30;;333:145;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;333:145:2;387:13;:30;;-1:-1:-1;;;;;;387:30:2;-1:-1:-1;;;;;387:30:2;;;;;;;;;61:715;;;-1:-1:-1;61:715:2;;",
   "deployedSourceMap": "61:715:2:-:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;486:232;;;;;;;;;;;;;;;;;;;-1:-1:-1;;;;;486:232:2;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;486:232:2;;-1:-1:-1;486:232:2;;-1:-1:-1;;;;;486:232:2:i;:::-;;726:47;;;;;;;;;;;;;;;;-1:-1:-1;726:47:2;;:::i;121:28::-;;;:::i;:::-;;;;-1:-1:-1;;;;;121:28:2;;;;;;;;;;;;;;283:41;;;;;;;;;;;;;;;;-1:-1:-1;283:41:2;;:::i;:::-;;;;;;;;;;;;;;;-1:-1:-1;;;;;283:41:2;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;84:30;;;:::i;:::-;;;;;;;;;;;;;;;;486:232;617:11;:13;;;;;;;;;664:46;;;;;;;;;;;;;;;;;;-1:-1:-1;;;;;664:46:2;;;;;;;;;;;;;;;641:20;;;:7;:20;;;;;;;:69;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;;;;;641:69:2;;;;;;;;;;;;;;;;664:46;;641:20;:69;;;;;;;;;:::i;:::-;-1:-1:-1;;;;;;486:232:2:o;726:47::-;;:::o;121:28::-;;;-1:-1:-1;;;;;121:28:2;;:::o;283:41::-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;283:41:2;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;;;;283:41:2;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::o;84:30::-;;;;:::o;-1:-1:-1:-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::i;:::-;;;:::o;:::-;;;;;;;;;;;;;;",
   "source": "// SPDX-License-Identifier: MIT\r\npragma solidity >=0.6.6;\r\n\r\ncontract Review {\r\n    uint256 public reviewCount = 0;\r\n    address public owner_address;\r\n\r\n    struct Review {\r\n        uint256 id;\r\n        uint256 score;\r\n        address person;\r\n        string content;\r\n    }\r\n\r\n    mapping(uint256 => Review) public reviews;\r\n\r\n    constructor(address _owner_address) public {\r\n        owner_address = _owner_address;\r\n        // createRating(_score, _person, _content);\r\n    }\r\n\r\n    function createRating(\r\n        uint256 _score,\r\n        address _person,\r\n        string memory _content\r\n    ) public {\r\n        reviewCount++;\r\n        reviews[reviewCount] = Review(reviewCount, _score, _person, _content);\r\n    }\r\n\r\n    function toggleCompleted(uint256 _id) public {}\r\n}\r\n",
-  "sourcePath": "D:\\Coding Projects\\RateMyBiz-Hackathon\\back-end\\smart-contracts\\contracts\\Review.sol",
+  "sourcePath": "D:\\Coding Projects\\RateMyBiz-Hackathon\\main\\back-end\\smart-contracts\\contracts\\Review.sol",
   "ast": {
     "absolutePath": "project:/contracts/Review.sol",
     "exportedSymbols": {
@@ -1761,7 +1761,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.7",
-  "updatedAt": "2022-04-15T19:45:19.556Z",
+  "updatedAt": "2022-04-16T01:45:51.487Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},

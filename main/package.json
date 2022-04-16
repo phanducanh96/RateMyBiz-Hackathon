@@ -1,8 +1,14 @@
 {
-  "name": "star-admin-pro-react",
-  "version": "1.1.0",
-  "homepage": "https://bootstrapdash.com/demo/star-admin-free/react/template/demo_1/preview",
+  "name": "decentralized-rating-system",
+  "version": "1.0.0",
+  "homepage": "",
+  "main": "./back-end/smart-contracts/truffle-config.js",
   "private": true,
+  "directories": {
+    "test": "test"
+  },
+  "author": "Duc Anh Phan",
+  "license": "MIT",
   "dependencies": {
     "@fullcalendar/core": "^4.3.1",
     "@fullcalendar/daygrid": "^4.3.0",
@@ -82,7 +88,14 @@
     "slick-carousel": "^1.8.1",
     "sweetalert2-react": "^0.8.3",
     "ti-icons": "^0.1.2",
-    "typicons.font": "^2.0.9"
+    "typicons.font": "^2.0.9",
+    "chai": "^4.1.2",
+    "chai-as-promised": "^7.1.1",
+    "chai-bignumber": "^2.0.2",
+    "nodemon": "^2.0.15",
+    "truffle": "^5.5.9",
+    "truffle-contract": "3.0.6",
+    "web3": "0.20.7"
   },
   "scripts": {
     "start": "react-scripts start",
