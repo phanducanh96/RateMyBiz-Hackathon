@@ -24,3 +24,4 @@
 /main/npm-debug.log*
 /main/yarn-debug.log*
 /main/yarn-error.log*
+/main/back-end/smart-contracts/ganache-logs
