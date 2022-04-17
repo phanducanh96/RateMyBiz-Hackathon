@@ -7,15 +7,11 @@ import Sidebar from './shared/Sidebar';
 import SettingsPanel from './shared/SettingsPanel';
 // import Footer from './shared/Footer';
 import { withTranslation } from "react-i18next";
-import Web3 from 'web3';
 import { alphaNumerate } from 'chartist';
-import { PROFILE_DETAIL_ABI, PROFILE_DETAIL_ADDRESS } from '../contracts-config'
 
 class App extends Component {
   state = {}
   componentDidMount() {
-    this.onRouteChanged();
-    this.loadBlockchainData();
   }
   render() {
     let navbarComponent = !this.state.isFullPageLayout ? <Navbar /> : '';
@@ -72,45 +68,6 @@ class App extends Component {
         })
         document.querySelector('.page-body-wrapper').classList.remove('full-page-wrapper');
       }
-    }
-  }
-
-  async loadBlockchainData() {
-    const web3 = new Web3(Web3.givenProvider || "http://127.0.0.1:7545");
-    await window.ethereum.enable();
-    const accounts = await web3.eth.getAccounts();
-    this.setState({ account: accounts });
-    const profileDetail = new web3.eth.Contract(PROFILE_DETAIL_ABI, PROFILE_DETAIL_ADDRESS)
-    this.setState({ profileDetail })
-    const reviewReceivedCount = await profileDetail.methods.reviewReceivedCount().call()
-    const reviewGivenCount = await profileDetail.methods.reviewGivenCount().call()
-
-    this.setState({ reviewGivenCount })
-    for (var i = 1; i <= reviewGivenCount; i++) {
-      const reviewGiven = await profileDetail.methods.reviewGivens(i).call()
-      this.setState({
-        reviewGivens: [...this.state.reviewGivens, reviewGiven]
-      })
-    }
-
-    this.setState({ reviewReceivedCount })
-    for (var i = 1; i <= reviewReceivedCount; i++) {
-      const receivedReview = await profileDetail.methods.receivedReviews(i).call()
-      this.setState({
-        receivedReviews: [...this.state.receivedReviews, receivedReview]
-      })
-    }
-
-  }
-
-  constructor(props) {
-    super(props)
-    this.state = {
-      account: '',
-      reviewGivenCount: 0,
-      reviewReceivedCount: 0,
-      reviewGivens: [],
-      receivedReviews: [],
     }
   }
 
