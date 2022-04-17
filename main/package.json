@@ -95,7 +95,7 @@
     "nodemon": "^2.0.15",
     "truffle": "^5.5.9",
     "truffle-contract": "3.0.6",
-    "web3": "0.20.7"
+    "web3": "^1.0.0-beta.46"
   },
   "scripts": {
     "start": "react-scripts start",
