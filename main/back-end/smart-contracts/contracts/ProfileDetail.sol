@@ -13,6 +13,7 @@ contract ProfileDetail {
         uint256 score;
         string content;
         string fromPerson;
+        string personType;
         uint256 personId;
     }
 
@@ -21,6 +22,7 @@ contract ProfileDetail {
         uint256 score;
         string content;
         string toPerson;
+        string personType;
         uint256 personId;
     }
 
@@ -33,6 +35,7 @@ contract ProfileDetail {
         uint256 score,
         string content,
         string fromPerson,
+        string personType,
         uint256 personId
     );
 
@@ -40,20 +43,25 @@ contract ProfileDetail {
         uint256 id,
         uint256 score,
         string content,
-        string fromPerson,
+        string toPerson,
+        string personType,
         uint256 personId
     );
 
     constructor(address _ownerAddress) public {
+        createReview(5, "My very first review", "Duc Anh", "Business", 1);
+        createReview(3, "My very second review", "Escanor", "Business", 2);
+        createReview(2, "My very third review", "Dude", "Customer", 3);
+        createReview(1, "My very fourth review", "Bruh", "Customer", 4);
+        createReview(5, "My very fifth review", "Hackerman", "Business", 5);
         ownerAddress = _ownerAddress;
-        // createRating(5, "My very first review");
-        createReview(5, "My very first review", "Duc Anh", 1);
     }
 
     function createReviewReceived(
         uint256 _score,
         string memory _content,
         string memory _fromPerson,
+        string memory _personType,
         uint256 _personId
     ) public {
         reviewReceivedCount++;
@@ -62,6 +70,7 @@ contract ProfileDetail {
             _score,
             _content,
             _fromPerson,
+            _personType,
             _personId
         );
         emit ReviewReceivedCreated(
@@ -69,6 +78,7 @@ contract ProfileDetail {
             _score,
             _content,
             _fromPerson,
+            _personType,
             _personId
         );
 
@@ -80,7 +90,8 @@ contract ProfileDetail {
     function createReview(
         uint256 _score,
         string memory _content,
-        string memory _fromPerson,
+        string memory _toPerson,
+        string memory _personType,
         uint256 _personId
     ) public {
         reviewGivenCount++;
@@ -88,7 +99,8 @@ contract ProfileDetail {
             reviewGivenCount,
             _score,
             _content,
-            _fromPerson,
+            _toPerson,
+            _personType,
             _personId
         );
 
@@ -96,7 +108,8 @@ contract ProfileDetail {
             reviewGivenCount,
             _score,
             _content,
-            _fromPerson,
+            _toPerson,
+            _personType,
             _personId
         );
     }

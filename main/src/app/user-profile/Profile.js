@@ -2,13 +2,13 @@ import React, { Component } from 'react'
 import { ProgressBar } from 'react-bootstrap';
 import { PROFILE_DETAIL_ABI, PROFILE_DETAIL_ADDRESS } from '../../contracts-config'
 import Web3 from 'web3';
+import { Form } from 'react-bootstrap';
 
 export class Profile extends Component {
     state = {}
     componentDidMount() {
         this.loadBlockchainData();
     }
-    // alert(this.props.reviewGivens)
 
     constructor(props) {
         super(props)
@@ -24,116 +24,210 @@ export class Profile extends Component {
     render() {
 
         return (
-            < div className="col-lg-12 grid-margin stretch-card" >
-                <ul id="taskList" className="list-unstyled">
-                    {this.state.reviewGivens.map((reviewGiven, key) => {
-                        return (
-                            <div className="taskTemplate" key={key}>
-                                <label>
-                                    <span className="content">{reviewGiven.content}</span>
-                                </label>
+            <div>
+
+                < div className="col-lg-12 grid-margin stretch-card" >
+                    <div className="card">
+                        <div className="card-body">
+                            <h4 className="card-title">Reviews Received</h4>
+                            <div className="table-responsive">
+                                <table className="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th> User </th>
+                                            <th> Business/Customer </th>
+                                            <th> Score </th>
+                                            <th> Review's Content </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td className="py-1">
+                                                <img src={require("../../assets/images/faces/face1.jpg")} alt="user icon" />
+                                            </td>
+                                            <td> Herman Beck </td>
+                                            <td>
+                                                <ProgressBar variant="success" now={100} />
+                                            </td>
+                                            <td> Test </td>
+                                        </tr>
+                                        <tr>
+                                            <td className="py-1">
+                                                <img src={require("../../assets/images/faces/face2.jpg")} alt="user icon" />
+                                            </td>
+                                            <td> Messsy Adam </td>
+                                            <td>
+                                                <ProgressBar variant="danger" now={90} />
+                                            </td>
+                                            <td> Test2 </td>
+                                        </tr>
+                                        <tr>
+                                            <td className="py-1">
+                                                <img src={require("../../assets/images/faces/face3.jpg")} alt="user icon" />
+                                            </td>
+                                            <td> John Richards </td>
+                                            <td>
+                                                <ProgressBar variant="warning" now={90} />
+                                            </td>
+                                            <td> Test 3 </td>
+                                        </tr>
+                                        <tr>
+                                            <td className="py-1">
+                                                <img src={require("../../assets/images/faces/face4.jpg")} alt="user icon" />
+                                            </td>
+                                            <td> Peter Meggik </td>
+                                            <td>
+                                                <ProgressBar variant="primary" now={50} />
+                                            </td>
+                                            <td> Test 4 </td>
+                                        </tr>
+                                        <tr>
+                                            <td className="py-1">
+                                                <img src={require("../../assets/images/faces/face5.jpg")} alt="user icon" />
+                                            </td>
+                                            <td> Edward </td>
+                                            <td>
+                                                <ProgressBar variant="danger" now={60} />
+                                            </td>
+                                            <td> Test 5 </td>
+                                        </tr>
+                                        <tr>
+                                            <td className="py-1">
+                                                <img src={require("../../assets/images/faces/face6.jpg")} alt="user icon" />
+                                            </td>
+                                            <td> John Doe </td>
+                                            <td>
+                                                <ProgressBar variant="info" now={65} />
+                                            </td>
+                                            <td> Test 6 </td>
+                                        </tr>
+                                        <tr>
+                                            <td className="py-1">
+                                                <img src={require("../../assets/images/faces/face7.jpg")} alt="user icon" />
+                                            </td>
+                                            <td> Henry Tom </td>
+                                            <td>
+                                                <ProgressBar variant="warning" now={20} />
+                                            </td>
+                                            <td> Test 7 </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
-                        )
-                    })}
-                </ul>
-                <div className="card">
-                    <div className="card-body">
-                        <h4 className="card-title">Review Table</h4>
-                        <div className="table-responsive">
-                            <table className="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th> User </th>
-                                        <th> Content </th>
-                                        <th> Score </th>
-                                        <th> Amount </th>
-                                        <th> Deadline </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td className="py-1">
-                                            <img src={require("../../assets/images/faces/face1.jpg")} alt="user icon" />
-                                        </td>
-                                        <td> Herman Beck </td>
-                                        <td>
-                                            <ProgressBar variant="success" now={100} />
-                                        </td>
-                                        <td> $ 77.99 </td>
-                                        <td> May 15, 2015 </td>
-                                    </tr>
-                                    <tr>
-                                        <td className="py-1">
-                                            <img src={require("../../assets/images/faces/face2.jpg")} alt="user icon" />
-                                        </td>
-                                        <td> Messsy Adam </td>
-                                        <td>
-                                            <ProgressBar variant="danger" now={90} />
-                                        </td>
-                                        <td> $245.30 </td>
-                                        <td> July 1, 2015 </td>
-                                    </tr>
-                                    <tr>
-                                        <td className="py-1">
-                                            <img src={require("../../assets/images/faces/face3.jpg")} alt="user icon" />
-                                        </td>
-                                        <td> John Richards </td>
-                                        <td>
-                                            <ProgressBar variant="warning" now={90} />
-                                        </td>
-                                        <td> $138.00 </td>
-                                        <td> Apr 12, 2015 </td>
-                                    </tr>
-                                    <tr>
-                                        <td className="py-1">
-                                            <img src={require("../../assets/images/faces/face4.jpg")} alt="user icon" />
-                                        </td>
-                                        <td> Peter Meggik </td>
-                                        <td>
-                                            <ProgressBar variant="primary" now={50} />
-                                        </td>
-                                        <td> $ 77.99 </td>
-                                        <td> May 15, 2015 </td>
-                                    </tr>
-                                    <tr>
-                                        <td className="py-1">
-                                            <img src={require("../../assets/images/faces/face5.jpg")} alt="user icon" />
-                                        </td>
-                                        <td> Edward </td>
-                                        <td>
-                                            <ProgressBar variant="danger" now={60} />
-                                        </td>
-                                        <td> $ 160.25 </td>
-                                        <td> May 03, 2015 </td>
-                                    </tr>
-                                    <tr>
-                                        <td className="py-1">
-                                            <img src={require("../../assets/images/faces/face6.jpg")} alt="user icon" />
-                                        </td>
-                                        <td> John Doe </td>
-                                        <td>
-                                            <ProgressBar variant="info" now={65} />
-                                        </td>
-                                        <td> $ 123.21 </td>
-                                        <td> April 05, 2015 </td>
-                                    </tr>
-                                    <tr>
-                                        <td className="py-1">
-                                            <img src={require("../../assets/images/faces/face7.jpg")} alt="user icon" />
-                                        </td>
-                                        <td> Henry Tom </td>
-                                        <td>
-                                            <ProgressBar variant="warning" now={20} />
-                                        </td>
-                                        <td> $ 150.00 </td>
-                                        <td> June 16, 2015 </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                        </div>
+                    </div>
+                </div >
+
+                < div className="col-lg-12 grid-margin stretch-card" >
+
+                    <div className="card">
+                        <div className="card-body">
+                            <h4 className="card-title">Reviews Given</h4>
+                            <div className="table-responsive">
+                                <table className="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th> User </th>
+                                            <th> Business/Customer </th>
+                                            <th> Score </th>
+                                            <th> Review's Content </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {this.state.reviewGivens.map((reviewGiven, key) => {
+                                            return (
+                                                <tr key={key}>
+                                                    <td className="person">
+                                                        {reviewGiven.toPerson}
+                                                    </td>
+                                                    <td> {reviewGiven.personType} </td>
+                                                    <td>
+                                                        <ProgressBar variant="success" now={20 * reviewGiven.score} />
+                                                    </td>
+                                                    <td> {reviewGiven.content} </td>
+                                                </tr>
+                                            )
+                                        })}
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div >
+
+                <div className="col-12 grid-margin stretch-card">
+                    <div className="card">
+                        <div className="card-body">
+                            <h4 className="card-title">Leave a Review</h4>
+                            <form className="forms-sample">
+                                <Form.Group>
+                                    <label htmlFor="exampleInputName1">Business Name</label>
+                                    <Form.Control type="text" className="form-control" id="exampleInputName1" placeholder="Name" />
+                                </Form.Group>
+
+                                <Form.Group>
+                                    <label htmlFor="exampleInputCity1">Score</label>
+                                    <div className="form-check">
+                                        <label className="form-check-label">
+                                            <input type="radio" className="form-check-input" name="optionsRadios" id="optionsRadios1" value="" />
+                                            <i className="input-helper"></i>
+                                            1 Star
+                                        </label>
+                                    </div>
+                                    <div className="form-check">
+                                        <label className="form-check-label">
+                                            <input type="radio" className="form-check-input" name="optionsRadios" id="optionsRadios2" value="option2" defaultChecked />
+                                            <i className="input-helper"></i>
+                                            2 Stars
+                                        </label>
+                                    </div>
+                                    <div className="form-check">
+                                        <label className="form-check-label">
+                                            <input type="radio" className="form-check-input" name="optionsRadios" id="optionsRadios2" value="option2" defaultChecked />
+                                            <i className="input-helper"></i>
+                                            3 Stars
+                                        </label>
+                                    </div>
+                                    <div className="form-check">
+                                        <label className="form-check-label">
+                                            <input type="radio" className="form-check-input" name="optionsRadios" id="optionsRadios2" value="option2" defaultChecked />
+                                            <i className="input-helper"></i>
+                                            4 Stars
+                                        </label>
+                                    </div>
+                                    <div className="form-check">
+                                        <label className="form-check-label">
+                                            <input type="radio" className="form-check-input" name="optionsRadios" id="optionsRadios2" value="option2" defaultChecked />
+                                            <i className="input-helper"></i>
+                                            5 Stars
+                                        </label>
+                                    </div>
+                                </Form.Group>
+
+
+
+                                <Form.Group>
+                                    <label htmlFor="exampleTextarea1">Review Content</label>
+                                    <textarea className="form-control" id="exampleTextarea1" rows="4"></textarea>
+                                </Form.Group>
+
+                                <Form.Group>
+                                    <label>Verification QR Code</label>
+                                    <div className="custom-file">
+                                        <Form.Control type="file" className="form-control visibility-hidden" id="customFileLang" lang="es" />
+                                        <label className="custom-file-label" htmlFor="customFileLang">Upload image</label>
+                                    </div>
+                                </Form.Group>
+                                <button type="submit" className="btn btn-primary mr-2">Submit</button>
+                                <button className="btn btn-light">Cancel</button>
+                            </form>
                         </div>
                     </div>
                 </div>
-            </div >
+
+            </div>
+
         )
     }
 
@@ -154,6 +248,7 @@ export class Profile extends Component {
                 reviewGivens: [...this.state.reviewGivens, reviewGiven]
             })
         }
+        console.log(this.state.reviewGivens)
 
         this.setState({ reviewReceivedCount })
         for (var i = 1; i <= reviewReceivedCount; i++) {
@@ -162,6 +257,7 @@ export class Profile extends Component {
                 receivedReviews: [...this.state.receivedReviews, receivedReview]
             })
         }
+        console.log(this.state.receivedReviews)
 
     }
 }

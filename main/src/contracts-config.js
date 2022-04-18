@@ -1,4 +1,4 @@
-export const PROFILE_DETAIL_ADDRESS = '0x2Ad8CF7E50e2eEE343E82E5649A2AecE6C151Cd5'
+export const PROFILE_DETAIL_ADDRESS = '0x12DFa1bBD35Cc827c979DDa305D22cB51D90e0F6'
 
 export const PROFILE_DETAIL_ABI = [
     {
@@ -36,7 +36,13 @@ export const PROFILE_DETAIL_ABI = [
             {
                 "indexed": false,
                 "internalType": "string",
-                "name": "fromPerson",
+                "name": "toPerson",
+                "type": "string"
+            },
+            {
+                "indexed": false,
+                "internalType": "string",
+                "name": "personType",
                 "type": "string"
             },
             {
@@ -74,6 +80,12 @@ export const PROFILE_DETAIL_ABI = [
                 "indexed": false,
                 "internalType": "string",
                 "name": "fromPerson",
+                "type": "string"
+            },
+            {
+                "indexed": false,
+                "internalType": "string",
+                "name": "personType",
                 "type": "string"
             },
             {
@@ -145,6 +157,11 @@ export const PROFILE_DETAIL_ABI = [
                 "type": "string"
             },
             {
+                "internalType": "string",
+                "name": "personType",
+                "type": "string"
+            },
+            {
                 "internalType": "uint256",
                 "name": "personId",
                 "type": "uint256"
@@ -196,6 +213,11 @@ export const PROFILE_DETAIL_ABI = [
             {
                 "internalType": "string",
                 "name": "toPerson",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "personType",
                 "type": "string"
             },
             {
@@ -254,6 +276,11 @@ export const PROFILE_DETAIL_ABI = [
                 "type": "string"
             },
             {
+                "internalType": "string",
+                "name": "_personType",
+                "type": "string"
+            },
+            {
                 "internalType": "uint256",
                 "name": "_personId",
                 "type": "uint256"
@@ -278,7 +305,12 @@ export const PROFILE_DETAIL_ABI = [
             },
             {
                 "internalType": "string",
-                "name": "_fromPerson",
+                "name": "_toPerson",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "_personType",
                 "type": "string"
             },
             {
