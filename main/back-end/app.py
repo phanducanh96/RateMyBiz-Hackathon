@@ -14,7 +14,7 @@ class Customer(db.Model):
 	email = db.Column(db.String(50), nullable=False, unique=True)
 	password = db.Column(db.String(50), nullable=False)
 	smart_contract = db.Column(db.String(200), unique=True)
-	# date_created = db.Column(db.DateTime, default=datetime.utcnow())
+	date_created = db.Column(db.DateTime, default=datetime.utcnow())
 	profile_pic = db.Column(db.LargeBinary)
 	about = db.Column(db.Text)
 
