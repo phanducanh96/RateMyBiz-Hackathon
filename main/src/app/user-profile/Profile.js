@@ -18,11 +18,13 @@ export class Profile extends Component {
             reviewReceivedCount: 0,
             reviewGivens: [],
             receivedReviews: [],
+            personType: '',
+            score: 0,
+            error: ''
         }
     }
 
     render() {
-
         return (
             <div>
 
@@ -129,7 +131,7 @@ export class Profile extends Component {
                                         <tr>
                                             <th> User </th>
                                             <th> Business/Customer </th>
-                                            <th> Score </th>
+                                            <th> Rating </th>
                                             <th> Review's Content </th>
                                         </tr>
                                     </thead>
@@ -160,45 +162,71 @@ export class Profile extends Component {
                     <div className="card">
                         <div className="card-body">
                             <h4 className="card-title">Leave a Review</h4>
-                            <form className="forms-sample">
+                            <form className="forms-sample" onSubmit={(event) => {
+                                event.preventDefault()
+                                this.createReview(this.state.score, this.content.value, this.toPerson.value, this.state.personType, this.personId.value)
+                            }}>
                                 <Form.Group>
-                                    <label htmlFor="exampleInputName1">Business Name</label>
-                                    <Form.Control type="text" className="form-control" id="exampleInputName1" placeholder="Name" />
+                                    <label htmlFor="exampleInputName1">Business/Customer Name</label>
+                                    <Form.Control type="text" className="form-control" id="name" placeholder="Name" ref={(input) => { this.toPerson = input }} required />
                                 </Form.Group>
 
                                 <Form.Group>
+                                    <label htmlFor="exampleInputName1">Person ID (Temporary)</label>
+                                    <Form.Control type="text" className="form-control" id="personId" placeholder="Name" ref={(input) => { this.personId = input }} required />
+                                </Form.Group>
+
+                                <Form.Group onChange={this.handlePersonType}>
+                                    <label htmlFor="exampleInputCity1">Person Type (Temporary)</label>
+                                    <div className="form-check">
+                                        <label className="form-check-label">
+                                            <input type="radio" className="form-check-input" name="personTypeRadios" id="businessOption" value="Business" onClick={(value) => { this.personType = value }} required />
+                                            <i className="input-helper"></i>
+                                            Business
+                                        </label>
+                                    </div>
+                                    <div className="form-check">
+                                        <label className="form-check-label">
+                                            <input type="radio" className="form-check-input" name="personTypeRadios" id="customerOption" value="Customer" onClick={(value) => { this.personType = value }} defaultChecked required />
+                                            <i className="input-helper"></i>
+                                            Customer
+                                        </label>
+                                    </div>
+                                </Form.Group>
+
+                                <Form.Group onChange={this.handleScore}>
                                     <label htmlFor="exampleInputCity1">Score</label>
                                     <div className="form-check">
                                         <label className="form-check-label">
-                                            <input type="radio" className="form-check-input" name="optionsRadios" id="optionsRadios1" value="" />
+                                            <input type="radio" className="form-check-input" name="ratingRadios" id="oneStar" value="1" ref={(value) => this.score} required />
                                             <i className="input-helper"></i>
                                             1 Star
                                         </label>
                                     </div>
                                     <div className="form-check">
                                         <label className="form-check-label">
-                                            <input type="radio" className="form-check-input" name="optionsRadios" id="optionsRadios2" value="option2" defaultChecked />
+                                            <input type="radio" className="form-check-input" name="ratingRadios" id="twoStars" value="2" ref={(value) => this.score} required />
                                             <i className="input-helper"></i>
                                             2 Stars
                                         </label>
                                     </div>
                                     <div className="form-check">
                                         <label className="form-check-label">
-                                            <input type="radio" className="form-check-input" name="optionsRadios" id="optionsRadios2" value="option2" defaultChecked />
+                                            <input type="radio" className="form-check-input" name="ratingRadios" id="threeStars" value="3" ref={(value) => this.score} required />
                                             <i className="input-helper"></i>
                                             3 Stars
                                         </label>
                                     </div>
                                     <div className="form-check">
                                         <label className="form-check-label">
-                                            <input type="radio" className="form-check-input" name="optionsRadios" id="optionsRadios2" value="option2" defaultChecked />
+                                            <input type="radio" className="form-check-input" name="ratingRadios" id="fourStars" value="4" ref={(value) => this.score} required />
                                             <i className="input-helper"></i>
                                             4 Stars
                                         </label>
                                     </div>
                                     <div className="form-check">
                                         <label className="form-check-label">
-                                            <input type="radio" className="form-check-input" name="optionsRadios" id="optionsRadios2" value="option2" defaultChecked />
+                                            <input type="radio" className="form-check-input" name="ratingRadios" id="fiveStars" value="5" ref={(value) => this.score} defaultChecked required />
                                             <i className="input-helper"></i>
                                             5 Stars
                                         </label>
@@ -209,7 +237,7 @@ export class Profile extends Component {
 
                                 <Form.Group>
                                     <label htmlFor="exampleTextarea1">Review Content</label>
-                                    <textarea className="form-control" id="exampleTextarea1" rows="4"></textarea>
+                                    <textarea className="form-control" id="exampleTextarea1" rows="4" ref={(input) => { this.content = input }} required></textarea>
                                 </Form.Group>
 
                                 <Form.Group>
@@ -224,18 +252,18 @@ export class Profile extends Component {
                             </form>
                         </div>
                     </div>
-                </div>
+                </div >
 
-            </div>
+            </div >
 
         )
     }
 
     async loadBlockchainData() {
-        const web3 = new Web3(Web3.givenProvider || "http://127.0.0.1:7545");
+        const web3 = new Web3(Web3.givenProvider || "http://localhost:8545");
         await window.ethereum.enable();
         const accounts = await web3.eth.getAccounts();
-        this.setState({ account: accounts });
+        this.setState({ account: accounts[0] });
         const profileDetail = new web3.eth.Contract(PROFILE_DETAIL_ABI, PROFILE_DETAIL_ADDRESS)
         this.setState({ profileDetail })
         const reviewReceivedCount = await profileDetail.methods.reviewReceivedCount().call()
@@ -260,5 +288,38 @@ export class Profile extends Component {
         console.log(this.state.receivedReviews)
 
     }
+
+    createReview(score, content, toPerson, personType, personId) {
+        console.log("Score: " + score)
+        console.log("Content: " + content)
+        console.log("toPerson: " + toPerson)
+        console.log("personType: " + personType)
+        console.log("personId: " + personId)
+        const error = ''
+        try {
+            this.state.profileDetail.methods.createReview(score, content, toPerson, personType, personId).send({ from: this.state.account })
+                .once('receipt', (receipt) => {
+                    window.location.reload()
+                })
+        } catch {
+            error = 'Something wrong, cannot update contract!'
+        }
+
+        this.setState({ error })
+        alert(error)
+    }
+
+    handlePersonType = event => {
+        console.log(event.target.value);
+        const personType = event.target.value
+        this.setState({ personType })
+    }
+
+    handleScore = event => {
+        console.log(event.target.value);
+        const score = event.target.value
+        this.setState({ score })
+    }
+
 }
 export default Profile
