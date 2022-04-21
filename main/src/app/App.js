@@ -7,26 +7,26 @@ import Sidebar from './shared/Sidebar';
 import SettingsPanel from './shared/SettingsPanel';
 // import Footer from './shared/Footer';
 import { withTranslation } from "react-i18next";
+import { alphaNumerate } from 'chartist';
 
 class App extends Component {
   state = {}
   componentDidMount() {
-    this.onRouteChanged();
   }
-  render () {
-    let navbarComponent = !this.state.isFullPageLayout ? <Navbar/> : '';
-    let sidebarComponent = !this.state.isFullPageLayout ? <Sidebar/> : '';
-    let SettingsPanelComponent = !this.state.isFullPageLayout ? <SettingsPanel/> : '';
+  render() {
+    let navbarComponent = !this.state.isFullPageLayout ? <Navbar /> : '';
+    let sidebarComponent = !this.state.isFullPageLayout ? <Sidebar /> : '';
+    let SettingsPanelComponent = !this.state.isFullPageLayout ? <SettingsPanel /> : '';
     // let footerComponent = !this.state.isFullPageLayout ? <Footer/> : '';
     return (
       <div className="container-scroller">
-        { navbarComponent }
+        {navbarComponent}
         <div className="container-fluid page-body-wrapper">
-          { sidebarComponent }
+          {sidebarComponent}
           <div className="main-panel">
             <div className="content-wrapper">
-              <AppRoutes/>
-              { SettingsPanelComponent }
+              <AppRoutes />
+              {SettingsPanelComponent}
             </div>
             {/* { footerComponent } */}
           </div>
@@ -45,7 +45,7 @@ class App extends Component {
     console.log("ROUTE CHANGED");
     const { i18n } = this.props;
     const body = document.querySelector('body');
-    if(this.props.location.pathname === '/layout/RtlLayout') {
+    if (this.props.location.pathname === '/layout/RtlLayout') {
       body.classList.add('rtl');
       i18n.changeLanguage('ar');
     }
@@ -55,7 +55,7 @@ class App extends Component {
     }
     window.scrollTo(0, 0);
     const fullPageLayoutRoutes = ['/login', '/signup', '/user-pages/lockscreen', '/error-pages/error-404', '/error-pages/error-500', '/general-pages/landing-page'];
-    for ( let i = 0; i < fullPageLayoutRoutes.length; i++ ) {
+    for (let i = 0; i < fullPageLayoutRoutes.length; i++) {
       if (this.props.location.pathname === fullPageLayoutRoutes[i]) {
         this.setState({
           isFullPageLayout: true

@@ -1,6 +1,6 @@
-const ProfileRating = artifacts.require("./ProfileRating.sol");
+const ProfileDetail = artifacts.require("./ProfileDetail.sol");
 
 module.exports = function (deployer, network, accounts) {
-    console.log(accounts[0]);
-    deployer.deploy(ProfileRating, '0x65F744Ce44082b61A03da55a2Db541508557AD5B', { from: accounts[1] });
+    deployer.deploy(ProfileDetail, accounts[0], { from: accounts[0] });
+    // deployer.deploy(ProfileDetail, accounts[1], { from: accounts[1] });
 };
