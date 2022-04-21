@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { ProgressBar } from 'react-bootstrap';
 import { PROFILE_DETAIL_ABI, PROFILE_DETAIL_ADDRESS } from '../../contracts-config'
 import Web3 from 'web3';
-import { Form } from 'react-bootstrap';
+import { Form, Alert } from 'react-bootstrap';
 
 export class Profile extends Component {
     state = {}
@@ -16,17 +16,31 @@ export class Profile extends Component {
             account: '',
             reviewGivenCount: 0,
             reviewReceivedCount: 0,
+            displayScore: 0,
             reviewGivens: [],
             receivedReviews: [],
             personType: '',
             score: 0,
-            error: ''
+            error: '',
+            reviewPendingError: 'You have 5 Pending Reviews, please Update'
         }
     }
 
     render() {
         return (
             <div>
+                <div className="col-md-6 grid-margin stretch-card average-price-card">
+                    <div className="card text-white">
+                        <div className="card-body">
+                            <div className="d-flex justify-content-between pb-2 align-items-center">
+                                <h2 className="font-weight-semibold mb-0">{this.state.displayScore}/5</h2>
+                            </div>
+                            <div className="d-flex justify-content-between">
+                                <h5 className="font-weight-semibold mb-0">Rating Score</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 < div className="col-lg-12 grid-margin stretch-card" >
                     <div className="card">
@@ -43,76 +57,20 @@ export class Profile extends Component {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td className="py-1">
-                                                <img src={require("../../assets/images/faces/face1.jpg")} alt="user icon" />
-                                            </td>
-                                            <td> Herman Beck </td>
-                                            <td>
-                                                <ProgressBar variant="success" now={100} />
-                                            </td>
-                                            <td> Test </td>
-                                        </tr>
-                                        <tr>
-                                            <td className="py-1">
-                                                <img src={require("../../assets/images/faces/face2.jpg")} alt="user icon" />
-                                            </td>
-                                            <td> Messsy Adam </td>
-                                            <td>
-                                                <ProgressBar variant="danger" now={90} />
-                                            </td>
-                                            <td> Test2 </td>
-                                        </tr>
-                                        <tr>
-                                            <td className="py-1">
-                                                <img src={require("../../assets/images/faces/face3.jpg")} alt="user icon" />
-                                            </td>
-                                            <td> John Richards </td>
-                                            <td>
-                                                <ProgressBar variant="warning" now={90} />
-                                            </td>
-                                            <td> Test 3 </td>
-                                        </tr>
-                                        <tr>
-                                            <td className="py-1">
-                                                <img src={require("../../assets/images/faces/face4.jpg")} alt="user icon" />
-                                            </td>
-                                            <td> Peter Meggik </td>
-                                            <td>
-                                                <ProgressBar variant="primary" now={50} />
-                                            </td>
-                                            <td> Test 4 </td>
-                                        </tr>
-                                        <tr>
-                                            <td className="py-1">
-                                                <img src={require("../../assets/images/faces/face5.jpg")} alt="user icon" />
-                                            </td>
-                                            <td> Edward </td>
-                                            <td>
-                                                <ProgressBar variant="danger" now={60} />
-                                            </td>
-                                            <td> Test 5 </td>
-                                        </tr>
-                                        <tr>
-                                            <td className="py-1">
-                                                <img src={require("../../assets/images/faces/face6.jpg")} alt="user icon" />
-                                            </td>
-                                            <td> John Doe </td>
-                                            <td>
-                                                <ProgressBar variant="info" now={65} />
-                                            </td>
-                                            <td> Test 6 </td>
-                                        </tr>
-                                        <tr>
-                                            <td className="py-1">
-                                                <img src={require("../../assets/images/faces/face7.jpg")} alt="user icon" />
-                                            </td>
-                                            <td> Henry Tom </td>
-                                            <td>
-                                                <ProgressBar variant="warning" now={20} />
-                                            </td>
-                                            <td> Test 7 </td>
-                                        </tr>
+                                        {this.state.receivedReviews.map((receivedReview, key) => {
+                                            return (
+                                                <tr key={key}>
+                                                    <td className="person">
+                                                        {receivedReview.fromPerson}
+                                                    </td>
+                                                    <td> {receivedReview.personType} </td>
+                                                    <td>
+                                                        <ProgressBar variant="success" now={20 * receivedReview.score} />
+                                                    </td>
+                                                    <td> {receivedReview.content} </td>
+                                                </tr>
+                                            )
+                                        })}
                                     </tbody>
                                 </table>
                             </div>
@@ -254,6 +212,32 @@ export class Profile extends Component {
                     </div>
                 </div >
 
+                <div className="col-12 grid-margin stretch-card">
+                    <div className="card">
+                        <div className="card-body">
+                            <h4 className="card-title">Update Rating Score</h4>
+
+                            <form className="forms-sample" onSubmit={(event) => {
+                                event.preventDefault()
+                                this.updateReview()
+                            }}>
+                                {this.state.reviewPendingError && <Alert variant="danger">{this.state.reviewPendingError}</Alert>}
+
+                                <Form.Group>
+                                    <label>Verification QR Code</label>
+                                    <div className="custom-file">
+                                        <Form.Control type="file" className="form-control visibility-hidden" id="customFileLang" lang="es" />
+                                        <label className="custom-file-label" htmlFor="customFileLang">Upload image</label>
+                                    </div>
+                                </Form.Group>
+
+                                <button type="submit" className="btn btn-primary mr-2">Update Review</button>
+                            </form>
+                        </div>
+                    </div>
+                </div >
+
+
             </div >
 
         )
@@ -268,6 +252,8 @@ export class Profile extends Component {
         this.setState({ profileDetail })
         const reviewReceivedCount = await profileDetail.methods.reviewReceivedCount().call()
         const reviewGivenCount = await profileDetail.methods.reviewGivenCount().call()
+        const displayScore = await profileDetail.methods.displayScore().call()
+        this.setState({ displayScore })
 
         this.setState({ reviewGivenCount })
         for (var i = 1; i <= reviewGivenCount; i++) {
@@ -276,6 +262,7 @@ export class Profile extends Component {
                 reviewGivens: [...this.state.reviewGivens, reviewGiven]
             })
         }
+        console.log("Given Reviews:")
         console.log(this.state.reviewGivens)
 
         this.setState({ reviewReceivedCount })
@@ -285,6 +272,7 @@ export class Profile extends Component {
                 receivedReviews: [...this.state.receivedReviews, receivedReview]
             })
         }
+        console.log("Received Reviews:")
         console.log(this.state.receivedReviews)
 
     }
@@ -297,7 +285,7 @@ export class Profile extends Component {
         console.log("personId: " + personId)
         const error = ''
         try {
-            this.state.profileDetail.methods.createReview(score, content, toPerson, personType, personId).send({ from: this.state.account })
+            this.state.profileDetail.methods.createReviewReceived(score, content, toPerson, personType, personId).send({ from: this.state.account })
                 .once('receipt', (receipt) => {
                     window.location.reload()
                 })
@@ -306,7 +294,21 @@ export class Profile extends Component {
         }
 
         this.setState({ error })
-        alert(error)
+    }
+
+    updateReview() {
+        const error = ''
+        //Hard Code Writing to the smart contract
+        try {
+            this.state.profileDetail.methods.createReviewReceived(5, "Second Review from the Goat", "Yeager", "Business", 4).send({ from: this.state.account })
+                .once('receipt', (receipt) => {
+                    window.location.reload()
+                })
+        } catch {
+            error = 'Something wrong, cannot update contract!'
+        }
+
+        this.setState({ error })
     }
 
     handlePersonType = event => {
