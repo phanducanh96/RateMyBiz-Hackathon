@@ -24,6 +24,8 @@ const Login = lazy(() => import('./user-pages/Login'));
 const Register = lazy(() => import('./user-pages/Register'));
 const Profile = lazy(() => import('./user-profile/Profile'));
 
+const QrCode = lazy(() => import('./user-pages/QrCode'));
+const QrReader = lazy(() => import('./user-pages/QrReader'));
 
 class AppRoutes extends Component {
 
@@ -52,9 +54,13 @@ class AppRoutes extends Component {
           <Route path="/signup" component={Register} />
           <Route path="/profile" component={Profile} />
 
+          <Route path="/qr-code" component={ QrCode } />
+          <Route path="/qr-reader" component={ QrReader } />
+
           <Route path="/error-pages/error-404" component={Error404} />
           <Route path="/error-pages/error-500" component={Error500} />
 
+          {/* <Route path="/flask-test" component={ FlaskTest } /> */}
 
           {/* <Redirect to="/user-pages/login-1" /> */}
         </Switch>

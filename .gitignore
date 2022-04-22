@@ -1,8 +1,5 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-#env
-/main/back-end/env
-
 # dependencies
 /main/node_modules
 
@@ -15,6 +12,8 @@
 # misc
 /main/back-end/.vscode
 /main/back-end/_pycache_
+/main/back-end/.flaskenv
+/main/back-end/env
 /main/.DS_Store
 /main/.env.local
 /main/.env.development.local
