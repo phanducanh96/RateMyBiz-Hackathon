@@ -4,6 +4,7 @@ from datetime import datetime
 from flask_marshmallow import Marshmallow
 import imageio as iio
 import io
+import requests
 
 from Verite.Issuer import issuer_qrcode
 
@@ -75,9 +76,19 @@ def my_profile():
 
 	return response_body
 
-@api.route('/api/users', methods=["GET"])
-def get_qr():
-	return send_from_directory('.', 'qr-code.png')
+@api.route('/api/get_qr_code', methods=["GET"])
+def api_get_qr():
+    url = "http://issuer-sandbox.circle.com/api/v1/issuance/qrcode"
+    response = requests.get(url)
+    if response.status_code == 200:
+        return response.content
+    else:
+        print("Failed for QR Code")
+
+@api.route('/api/read_qr_code', methods=["GET"])
+def read_qr(qr_img):
+
+	return ''
 
 if __name__ == '__main__':
 	api.run()

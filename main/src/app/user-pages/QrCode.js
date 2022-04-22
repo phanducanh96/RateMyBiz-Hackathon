@@ -27,7 +27,7 @@ class QrCode extends Component {
 	}
 
 	getQrCode() {
-		axios.get('/api/users', { responseType: 'blob' })
+		axios.get('/api/get_qr_code', { responseType: 'blob' })
 			.then((response) => {
 				console.log(response.data)
 				// let img = URL.createObjectURL(response)
@@ -37,6 +37,7 @@ class QrCode extends Component {
 				});
 
 			}).catch((error) => {
+				console.log("Yo")
 				if (error.response) {
 					console.log(error.response)
 					console.log(error.response.status)

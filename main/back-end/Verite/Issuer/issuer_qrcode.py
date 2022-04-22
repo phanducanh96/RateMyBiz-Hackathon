@@ -7,11 +7,11 @@ import jwt
 # from jwt.algorithms import RSAAlgorithm
 
 def api_get_qr():
-    url = "http://verifier-sandbox.circle.com/api/v1/issuance/qrcode"
+    url = "http://issuer-sandbox.circle.com/api/v1/issuance/qrcode"
     response = requests.get(url)
     if response.status_code == 200:
         print("Issuer Verified!")
-        with open("back-end/qr-code.png", 'wb') as f:
+        with open("qr-code.png", 'wb') as f:
             f.write(response.content)
     else:
         print("Failed for QR Code")
@@ -118,6 +118,7 @@ def public_key_gen(gwt_string):
 if __name__ == "__main__":
     api_get_qr()
     url = read_qr_code()
-    jwt_string = api_get_issuer(url)
-    public_key_gen(jwt_string)
+    print(url)
+    # jwt_string = api_get_issuer(url)
+    # public_key_gen(jwt_string)
     
