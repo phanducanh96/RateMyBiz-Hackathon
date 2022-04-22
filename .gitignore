@@ -12,6 +12,8 @@
 # misc
 /main/back-end/.vscode
 /main/back-end/_pycache_
+/main/back-end/.flaskenv
+/main/back-end/env
 /main/.DS_Store
 /main/.env.local
 /main/.env.development.local
