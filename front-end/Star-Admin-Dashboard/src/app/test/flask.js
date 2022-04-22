@@ -21,7 +21,7 @@ class Flask extends Component {
 	}
 
 	getData() {
-			axios.get('/profile')
+			axios.get('/get')
 			.then((response) => {
 				console.log(response.data)
 				this.setState({

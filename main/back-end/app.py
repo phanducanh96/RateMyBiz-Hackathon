@@ -1,11 +1,18 @@
-from flask import Flask
+from flask import Flask, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from flask_marshmallow import Marshmallow
+import imageio as iio
+import io
+
+from Verite.Issuer import issuer_qrcode
 
 api = Flask(__name__)
 api.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
-# Initialize database
+api.config['SQLALCHEMY_TRACK_MODIFICAITONS'] = False
+# Initialize database and serilization
 db = SQLAlchemy(api)
+ma = Marshmallow(api)
 
 class Customer(db.Model):
 	id = db.Column(db.Integer, primary_key=True, nullable=False)
@@ -59,7 +66,7 @@ class Product(db.Model):
 	def __repr__(self):
 		return '<Name %r>' % self.id
 
-@api.route('/profile', methods=["GET"])
+@api.route('/get', methods=["GET"])
 def my_profile():
 	response_body = {
 		"name": "Nagato",
@@ -68,3 +75,10 @@ def my_profile():
 
 	return response_body
 
+@api.route('/api/users', methods=["GET"])
+def get_qr():
+	return send_from_directory('.', 'qr-code.png')
+
+if __name__ == '__main__':
+	api.run()
+	
