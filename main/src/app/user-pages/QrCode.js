@@ -1,5 +1,6 @@
 import React, { Component, Popup } from 'react';
 import axios from 'axios';
+import { readQrCode } from '../utils/Utils';
 
 class QrCode extends Component {
 	constructor(props) {
@@ -12,16 +13,17 @@ class QrCode extends Component {
 
 	render() {
 
-		const qr_img = (this.state.visible ? <img src={this.state.qrCode} /> : null)
+		const qrImg = (this.state.visible ? <img src={this.state.qrCode} /> : null)
 
 		return (
 			<div>
 				<button onClick={() => this.getQrCode()}>Click me for QR</button>
 
 				<div>
-					{qr_img}
+					{qrImg}
 				</div>
 
+				<button onClick={readQrCode(qrImg)}>Click me to read QR</button>
 			</div>
 		);
 	}
@@ -37,7 +39,6 @@ class QrCode extends Component {
 				});
 
 			}).catch((error) => {
-				console.log("Yo")
 				if (error.response) {
 					console.log(error.response)
 					console.log(error.response.status)

@@ -5,6 +5,9 @@ from flask_marshmallow import Marshmallow
 import imageio as iio
 import io
 import requests
+from pyzbar import pyzbar
+from PIL import Image
+import json
 
 from Verite.Issuer import issuer_qrcode
 
@@ -85,10 +88,13 @@ def api_get_qr():
     else:
         print("Failed for QR Code")
 
-@api.route('/api/read_qr_code', methods=["GET"])
-def read_qr(qr_img):
-
-	return ''
+@api.route('/api/read_qr_code/<qrImg>', methods=["GET"])
+def read_qr(qrImg):
+	output = pyzbar.decode(qrImg)
+	qr_data = str(output[0].data).lstrip("b'").rstrip("'")
+	qr_data = json.loads(qr_data)
+	print(qr_data["challengeTokenUrl"])
+	return qr_data["challengeTokenUrl"]
 
 if __name__ == '__main__':
 	api.run()
