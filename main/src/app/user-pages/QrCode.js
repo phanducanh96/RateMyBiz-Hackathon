@@ -1,6 +1,5 @@
 import React, { Component, Popup } from 'react';
 import axios from 'axios';
-import { readQrCode } from '../utils/Utils';
 
 class QrCode extends Component {
 	constructor(props) {
@@ -23,7 +22,6 @@ class QrCode extends Component {
 					{qrImg}
 				</div>
 
-				<button onClick={readQrCode(qrImg)}>Click me to read QR</button>
 			</div>
 		);
 	}
