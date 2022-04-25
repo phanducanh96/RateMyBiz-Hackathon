@@ -1,12 +1,12 @@
 import axios from 'axios';
+import { useState } from 'react'
 
 
-export const readQrCode = (qrImg) => {
+export const readQrCode = (srcQrImg) => {
     axios({
         method: 'get',
         url: '/api/read_qr_code/',
-        params: qrImg,
-        responseType: 'json',
+        params: srcQrImg,
     }).then((response) => {
         console.log(response.data)
         // let img = URL.createObjectURL(response)
@@ -19,3 +19,4 @@ export const readQrCode = (qrImg) => {
         }
     });
 }
+
