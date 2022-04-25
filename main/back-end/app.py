@@ -10,6 +10,7 @@ from PIL import Image
 import json
 import sys
 import jwt
+import http.client
 
 from Verite.Issuer import issuer_qrcode
 
@@ -185,9 +186,103 @@ def get_issuer_credential():
 	return vc_jwt_string
 
 @api.route('/api/issuer/<params_data>', methods=["GET"])
-def get_issuer_credential(params_data):
+def get_verified(params_data):
+	#Reading Param from User
+	params = json.loads(params_data)
+	did = params['did']
+	vc_jwt = params['vc_jwt']
+	host_port = params['host_port']
+
+	#Get Challenge URL from Verifier
+	verification_endpoint =  "/verifications"
+	conn = http.client.HTTPSConnection(host_port)
+	data = json.loads("""
+	{
+   		"network": "ethereum",
+   		"subject": "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266",
+   		"chainId": 1337
+	}
+	""")
+	headers = {'Content-type': 'application/json'}
+	conn.request("POST", verification_endpoint, json.dumps(data), headers)
+	res = conn.getresponse()
+	if res.status >= 300:
+		print("Failed to get Challenge URL from Verifier", res.status, res.reason)
+		sys.exit(1)
+	res_data = res.read().decode('utf-8')
+	credential_application = json.loads(res_data)
+	challenge_url = credential_application['challengeTokenUrl']
+
+	#Get Credential Offer from Verifier
+	conn.request("GET", challenge_url)
+	res = conn.getresponse()
+	if res.status >= 300:
+		print("Failed to get Credential Verification from Verifier", res.status, res.reason)
+		sys.exit(1)
+	res_data = res.read().decode('utf-8')
+	verification_offer = json.loads(res_data)
+	print(json.dumps(verification_offer, indent=2))
 	
-	return ''
+	data = json.loads("""
+	{
+  		"credential_fulfillment": {
+    	"descriptor_map": [
+      		{
+        		"format": "jwt_vc",
+        		"id": "proofOfIdentifierControlVP",
+        		"path": "$.presentation.credential[0]"
+      		}
+    	],
+    	"id": "e921d5b2-5293-4297-a467-907f9d565e4e",
+    	"manifest_id": "KYCAMLAttestation"
+  	},
+  		"presentation_submission": {
+      		"id": "b68fda51-21aa-4cdf-84b7-d452b1c9c3cc",
+      		"descriptor_map": [
+          		{
+              		"format": "jwt_vc",
+              		"id": "kycaml_input",
+              		"path": "$.verifiableCredential[0]"
+          		}
+      		]
+  	},
+  	"vp": {
+    	"@context": [
+      		"https://www.w3.org/2018/credentials/v1"
+    	],
+    	"type": [
+      		"VerifiablePresentation",
+      		"CredentialFulfillment"
+        ]
+  	}
+	}
+	""")
+
+	# Set correct fields from user's param
+	data['nonce'] = verification_offer['body']['challenge']
+	data['presentation_submission']['definition_id'] = verification_offer['body']['presentation_definition']['id']
+	data['sub'] = did
+	data['iss'] = did
+	data['vp']['verifiableCredential'] = [vc_jwt]
+	data['vp']['holder'] = did
+
+	with open('./wallet-private-key.pkcs1.pem') as reader:
+		private_key = reader.read()
+
+	headers = {'Content-type': 'text/plain'}
+	jwt_string = jwt.encode(data, private_key, algorithm="ES256K")
+
+	conn.request("POST", verification_offer['reply_url'], jwt_string, headers)
+	res = conn.getresponse()
+	if res.status >= 300:
+		print("Failed to Verified the Credential", res.status, res.reason)
+		sys.exit(1)
+
+	res_data = res.read().decode('utf-8')
+	verification_confirmation = json.loads(res_data)
+	print(json.dumps(verification_confirmation, indent=2))
+	
+	return verification_confirmation
 
 if __name__ == '__main__':
 	api.run()

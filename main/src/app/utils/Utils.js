@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { useState } from 'react'
 
 
 export const readQrCode = (srcQrImg) => {
@@ -18,5 +17,27 @@ export const readQrCode = (srcQrImg) => {
             console.log(error.response.headers)
         }
     });
+}
+
+export const verification = (verifierParams) => {
+    const status = 'fail'
+
+    axios({
+        method: 'get',
+        url: '/api/get_verified/',
+        params: verifierParams,
+        responseType: 'json'
+    }).then((response) => {
+        console.log(response.data)
+        const res = response.data
+        status = res.status
+    }).catch((error) => {
+        if (error.response) {
+            console.log(error.response)
+            console.log(error.response.status)
+            console.log(error.response.headers)
+        }
+    });
+    return status
 }
 

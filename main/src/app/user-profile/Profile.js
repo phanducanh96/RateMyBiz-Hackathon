@@ -3,6 +3,7 @@ import { ProgressBar } from 'react-bootstrap';
 import { PROFILE_DETAIL_ABI, PROFILE_DETAIL_ADDRESS } from '../../contracts-config'
 import Web3 from 'web3';
 import { Form, Alert } from 'react-bootstrap';
+import { verification } from '../utils/Utils';
 
 export class Profile extends Component {
     state = {}
@@ -22,8 +23,12 @@ export class Profile extends Component {
             personType: '',
             score: 0,
             error: '',
+            credentialParams: '',
             reviewPendingError: 'You have 5 Pending Reviews, please Update'
         }
+
+        this.verification = verification.bind(this)
+
     }
 
     render() {
@@ -199,10 +204,10 @@ export class Profile extends Component {
                                 </Form.Group>
 
                                 <Form.Group>
-                                    <label>Verification QR Code</label>
+                                    <label>Credential Public Key</label>
                                     <div className="custom-file">
-                                        <Form.Control type="file" className="form-control visibility-hidden" id="customFileLang" lang="es" />
-                                        <label className="custom-file-label" htmlFor="customFileLang">Upload image</label>
+                                        <input type="file" onChange={e => this.onFileChange(e.target.files[0])} />
+
                                     </div>
                                 </Form.Group>
                                 <button type="submit" className="btn btn-primary mr-2">Submit</button>
@@ -284,14 +289,15 @@ export class Profile extends Component {
         console.log("personType: " + personType)
         console.log("personId: " + personId)
         const error = ''
-        try {
-            this.state.profileDetail.methods.createReviewReceived(score, content, toPerson, personType, personId).send({ from: this.state.account })
-                .once('receipt', (receipt) => {
-                    window.location.reload()
-                })
-        } catch {
-            error = 'Something wrong, cannot update contract!'
-        }
+        const test = this.verification()
+        // try {
+        //     this.state.profileDetail.methods.createReviewReceived(score, content, toPerson, personType, personId).send({ from: this.state.account })
+        //         .once('receipt', (receipt) => {
+        //             window.location.reload()
+        //         })
+        // } catch {
+        //     error = 'Something wrong, cannot update contract!'
+        // }
 
         this.setState({ error })
     }
@@ -323,5 +329,16 @@ export class Profile extends Component {
         this.setState({ score })
     }
 
+    onFileChange = (file) => {
+        const reader = new FileReader();
+        reader.onloadend = this.handleFile;
+        reader.readAsText(file)
+    }
+
+    handleFile = (e) => {
+        const content = e.target.result;
+        this.setState({ credentialParams: content });
+        console.log(this.state.credentialParams)
+    }
 }
 export default Profile
