@@ -119,6 +119,7 @@ class Sidebar extends Component {
             </div>
             <Collapse in={this.state.profilesMenuOpen}>
               <ul className="nav flex-column sub-menu">
+                <li className="nav-item"> <Link className={this.isPathActive('/public-profile') ? 'nav-link active' : 'nav-link'} to="/public-profile"><Trans>Your Public Profile</Trans></Link></li>
                 <li className="nav-item"> <Link className={this.isPathActive('/profile') ? 'nav-link active' : 'nav-link'} to="/profile"><Trans>Your Profile Detail</Trans></Link></li>
                 <li className="nav-item"> <Link className={this.isPathActive('/personal-profile-edit') ? 'nav-link active' : 'nav-link'} to="/personal-profile-edit"><Trans>Edit Your Personal Info</Trans></Link></li>
                 <li className="nav-item"> <Link className={this.isPathActive('/business-profile-edit') ? 'nav-link active' : 'nav-link'} to="/business-profile-edit"><Trans>Edit Your Business Info</Trans></Link></li>

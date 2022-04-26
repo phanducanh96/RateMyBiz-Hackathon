@@ -25,6 +25,7 @@ const Error500 = lazy(() => import('./error-pages/Error500'));
 const Login = lazy(() => import('./user-pages/Login'));
 const Register = lazy(() => import('./user-pages/Register'));
 const Profile = lazy(() => import('./user-profile/Profile'));
+const PublicProfile = lazy(() => import('./user-profile/PublicProfile'));
 
 const QrCode = lazy(() => import('./user-pages/QrCode'));
 const QrReader = lazy(() => import('./user-pages/QrReader'));
@@ -59,6 +60,7 @@ class AppRoutes extends Component {
           <Route path="/login" component={Login} />
           <Route path="/signup" component={Register} />
           <Route path="/profile" component={Profile} />
+          <Route path="/public-profile" component={PublicProfile} />
 
           <Route path="/qr-code" component={QrCode} />
           <Route path="/qr-reader" component={QrReader} />
