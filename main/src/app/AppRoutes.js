@@ -68,8 +68,8 @@ class AppRoutes extends Component {
           <Route path="/error-pages/error-404" component={Error404} />
           <Route path="/error-pages/error-500" component={Error500} />
 
-          <Route path="/personal-profile" component={PersonalProfile} />
-          <Route path="/business-profile" component={BusinessProfile} />
+          <Route path="/personal-profile-edit" component={PersonalProfile} />
+          <Route path="/business-profile-edit" component={BusinessProfile} />
 
           <Route path="/dashboard-index" component={DashboardIndex} />
 
