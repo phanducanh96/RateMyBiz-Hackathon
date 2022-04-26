@@ -26,6 +26,7 @@ const Profile = lazy(() => import('./user-profile/Profile'));
 
 const QrCode = lazy(() => import('./user-pages/QrCode'));
 const QrReader = lazy(() => import('./user-pages/QrReader'));
+const CredentialOffer = lazy(() => import('./user-pages/CredentialOffer'));
 
 class AppRoutes extends Component {
 
@@ -54,8 +55,10 @@ class AppRoutes extends Component {
           <Route path="/signup" component={Register} />
           <Route path="/profile" component={Profile} />
 
-          <Route path="/qr-code" component={ QrCode } />
-          <Route path="/qr-reader" component={ QrReader } />
+          <Route path="/qr-code" component={QrCode} />
+          <Route path="/qr-reader" component={QrReader} />
+
+          <Route path="/credential-offer" component={CredentialOffer} />
 
           <Route path="/error-pages/error-404" component={Error404} />
           <Route path="/error-pages/error-500" component={Error500} />

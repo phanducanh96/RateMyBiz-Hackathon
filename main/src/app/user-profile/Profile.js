@@ -3,6 +3,8 @@ import { ProgressBar } from 'react-bootstrap';
 import { PROFILE_DETAIL_ABI, PROFILE_DETAIL_ADDRESS } from '../../contracts-config'
 import Web3 from 'web3';
 import { Form, Alert } from 'react-bootstrap';
+import axios from 'axios';
+import { delay } from '../utils/Utils';
 
 export class Profile extends Component {
     state = {}
@@ -19,11 +21,14 @@ export class Profile extends Component {
             displayScore: 0,
             reviewGivens: [],
             receivedReviews: [],
-            personType: '',
-            score: 0,
+            personType: 'Customer',
+            score: 5,
             error: '',
+            credentialParams: '',
+            verifiedStatus: 'fail',
             reviewPendingError: 'You have 5 Pending Reviews, please Update'
         }
+
     }
 
     render() {
@@ -199,10 +204,10 @@ export class Profile extends Component {
                                 </Form.Group>
 
                                 <Form.Group>
-                                    <label>Verification QR Code</label>
+                                    <label>Credential Public Key</label>
                                     <div className="custom-file">
-                                        <Form.Control type="file" className="form-control visibility-hidden" id="customFileLang" lang="es" />
-                                        <label className="custom-file-label" htmlFor="customFileLang">Upload image</label>
+                                        <input type="file" onChange={e => this.onFileChange(e.target.files[0])} required />
+
                                     </div>
                                 </Form.Group>
                                 <button type="submit" className="btn btn-primary mr-2">Submit</button>
@@ -224,11 +229,12 @@ export class Profile extends Component {
                                 {this.state.reviewPendingError && <Alert variant="danger">{this.state.reviewPendingError}</Alert>}
 
                                 <Form.Group>
-                                    <label>Verification QR Code</label>
+                                    <label>Credential Public Key</label>
+
                                     <div className="custom-file">
-                                        <Form.Control type="file" className="form-control visibility-hidden" id="customFileLang" lang="es" />
-                                        <label className="custom-file-label" htmlFor="customFileLang">Upload image</label>
+                                        <input type="file" onChange={e => this.onFileChange(e.target.files[0])} required />
                                     </div>
+
                                 </Form.Group>
 
                                 <button type="submit" className="btn btn-primary mr-2">Update Review</button>
@@ -277,35 +283,53 @@ export class Profile extends Component {
 
     }
 
-    createReview(score, content, toPerson, personType, personId) {
+    async createReview(score, content, toPerson, personType, personId) {
         console.log("Score: " + score)
         console.log("Content: " + content)
         console.log("toPerson: " + toPerson)
         console.log("personType: " + personType)
         console.log("personId: " + personId)
         const error = ''
-        try {
-            this.state.profileDetail.methods.createReviewReceived(score, content, toPerson, personType, personId).send({ from: this.state.account })
-                .once('receipt', (receipt) => {
-                    window.location.reload()
-                })
-        } catch {
-            error = 'Something wrong, cannot update contract!'
-        }
+        const credentialParamsJson = JSON.parse(this.state.credentialParams)
+        this.verification(credentialParamsJson["vc_jwt"])
+        await delay(1000)
+        console.log(this.state.verifiedStatus)
 
+        if (this.state.verifiedStatus == "success") {
+            try {
+                this.state.profileDetail.methods.createReview(score, content, toPerson, personType, personId).send({ from: this.state.account })
+                    .once('receipt', (receipt) => {
+                        window.location.reload()
+                    })
+            } catch {
+                error = 'Something wrong, cannot update contract!'
+            }
+
+        } else {
+            error = 'Cannot Verified Identity!'
+        }
         this.setState({ error })
     }
 
-    updateReview() {
+    async updateReview() {
         const error = ''
+        const credentialParamsJson = JSON.parse(this.state.credentialParams)
+        this.verification(credentialParamsJson["vc_jwt"])
+        await delay(1000)
+        console.log(this.state.verifiedStatus)
+
         //Hard Code Writing to the smart contract
-        try {
-            this.state.profileDetail.methods.createReviewReceived(5, "Second Review from the Goat", "Yeager", "Business", 4).send({ from: this.state.account })
-                .once('receipt', (receipt) => {
-                    window.location.reload()
-                })
-        } catch {
-            error = 'Something wrong, cannot update contract!'
+        if (this.state.verifiedStatus == "success") {
+            try {
+                this.state.profileDetail.methods.createReviewReceived(2, "Verified Test Update", "Ace", "Customer", 12).send({ from: this.state.account })
+                    .once('receipt', (receipt) => {
+                        window.location.reload()
+                    })
+            } catch {
+                error = 'Something wrong, cannot update contract!'
+            }
+        } else {
+            error = 'Cannot Verified Identity!'
         }
 
         this.setState({ error })
@@ -323,5 +347,35 @@ export class Profile extends Component {
         this.setState({ score })
     }
 
+    onFileChange = (file) => {
+        const reader = new FileReader();
+        reader.onloadend = this.handleFile;
+        reader.readAsText(file)
+    }
+
+    handleFile = (e) => {
+        const content = e.target.result;
+        this.setState({ credentialParams: content });
+        console.log(this.state.credentialParams)
+    }
+
+    verification = async (verifierParams) => {
+
+        axios({
+            method: 'get',
+            url: '/api/get_verified/' + verifierParams,
+        }).then((response) => {
+            console.log(response.data)
+            const verifiedStatus = response.data.status
+            this.setState({ verifiedStatus })
+        }).catch((error) => {
+            if (error.response) {
+                console.log(error.response)
+                console.log(error.response.status)
+                console.log(error.response.headers)
+            }
+        });
+
+    }
 }
 export default Profile

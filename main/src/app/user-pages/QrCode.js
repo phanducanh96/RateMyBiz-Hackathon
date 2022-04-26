@@ -12,14 +12,14 @@ class QrCode extends Component {
 
 	render() {
 
-		const qr_img = (this.state.visible ? <img src={this.state.qrCode} /> : null)
+		const qrImg = (this.state.visible ? <img src={this.state.qrCode} /> : null)
 
 		return (
 			<div>
 				<button onClick={() => this.getQrCode()}>Click me for QR</button>
 
 				<div>
-					{qr_img}
+					{qrImg}
 				</div>
 
 			</div>
@@ -37,7 +37,6 @@ class QrCode extends Component {
 				});
 
 			}).catch((error) => {
-				console.log("Yo")
 				if (error.response) {
 					console.log(error.response)
 					console.log(error.response.status)
