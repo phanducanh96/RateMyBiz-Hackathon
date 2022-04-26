@@ -185,13 +185,22 @@ def get_issuer_credential():
 	vc_jwt_string = decoded_payload['vp']['verifiableCredential'][0]
 	return vc_jwt_string
 
-@api.route('/api/issuer/<params_data>', methods=["GET"])
+@api.route('/api/get_verified/<params_data>', methods=["GET"])
 def get_verified(params_data):
+	
+	verifiers_data = json.loads("""
+	{
+    	"host_port": "verifier-sandbox.circle.com",
+    	"did": "did:key:zQ3shv378PvkMuRrYMGFV9a3MtKpJkteqb2dUbQMEMvtWc2tE",
+    	"vc_jwt": ""
+	}
+	""")
+	verifiers_data["vc_jwt"] = params_data
+
 	#Reading Param from User
-	params = json.loads(params_data)
-	did = params['did']
-	vc_jwt = params['vc_jwt']
-	host_port = params['host_port']
+	did = verifiers_data['did']
+	vc_jwt = verifiers_data['vc_jwt']
+	host_port = verifiers_data['host_port']
 
 	#Get Challenge URL from Verifier
 	verification_endpoint =  "/verifications"
