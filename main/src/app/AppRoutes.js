@@ -6,6 +6,8 @@ import Spinner from '../app/shared/Spinner';
 
 const Dashboard = lazy(() => import('./dashboard/Dashboard'));
 
+const DashboardIndex = lazy(() => import('./dashboard/DashboardIndex'));
+
 const Buttons = lazy(() => import('./basic-ui/Buttons'));
 const Dropdowns = lazy(() => import('./basic-ui/Dropdowns'));
 
@@ -28,6 +30,9 @@ const QrCode = lazy(() => import('./user-pages/QrCode'));
 const QrReader = lazy(() => import('./user-pages/QrReader'));
 const CredentialOffer = lazy(() => import('./user-pages/CredentialOffer'));
 
+const BusinessProfile = lazy(() => import('./user-pages/BusinessProfile'));
+const PersonalProfile = lazy(() => import('./user-pages/PersonalProfile'));
+
 class AppRoutes extends Component {
 
   render() {
@@ -35,9 +40,9 @@ class AppRoutes extends Component {
     return (
       <Suspense fallback={<Spinner />}>
         <Switch>
-          <PrivateRoute exact path="/" component={Dashboard} />
+          <PrivateRoute exact path="/" component={DashboardIndex} />
 
-          <PrivateRoute exact path="/dashboard" component={Dashboard} />
+          <PrivateRoute exact path="/dashboard-index" component={DashboardIndex} />
 
           <Route path="/basic-ui/buttons" component={Buttons} />
           <Route path="/basic-ui/dropdowns" component={Dropdowns} />
@@ -63,9 +68,11 @@ class AppRoutes extends Component {
           <Route path="/error-pages/error-404" component={Error404} />
           <Route path="/error-pages/error-500" component={Error500} />
 
-          {/* <Route path="/flask-test" component={ FlaskTest } /> */}
+          <Route path="/personal-profile" component={PersonalProfile} />
+          <Route path="/business-profile" component={BusinessProfile} />
 
-          {/* <Redirect to="/user-pages/login-1" /> */}
+          <Route path="/dashboard-index" component={DashboardIndex} />
+
         </Switch>
       </Suspense>
     );
