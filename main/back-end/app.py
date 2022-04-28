@@ -40,10 +40,12 @@ class Entity(db.Model):
     def __repr__(self):
         return '<Entity %r>' % self.id
 
+
 class EntitySchema(ma.Schema):
-	class Meta:
-		fields = ("id", "name", "email", "password", 
-				"type", "smart_contract", "date_created", "about")
+    class Meta:
+        fields = ("id", "name", "email", "password",
+                        "type", "smart_contract", "date_created", "about")
+
 
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -64,10 +66,12 @@ class Product(db.Model):
     def __repr__(self):
         return '<Name %r>' % self.id
 
+
 class ProductSchema(ma.Schema):
-	class Meta:
-		fields = ("id", "name", "businessId", "image", 
-	    		"about", "price")
+    class Meta:
+        fields = ("id", "name", "businessId", "image",
+                  "about", "price")
+
 
 class Review(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -87,10 +91,12 @@ class Review(db.Model):
     def __repr__(self):
         return '<Name %r>' % self.id
 
+
 class ReviewSchema(ma.Schema):
-	class Meta:
-		fields = ("id", "score", "content", "fromEntityId", 
-				"toEntityId")
+    class Meta:
+        fields = ("id", "score", "content", "fromEntityId",
+                        "toEntityId")
+
 
 @api.before_first_request
 def create_tables():
@@ -152,8 +158,9 @@ def create_record_form():
         smart_contract = request.args.get('smart_contract', None)
         total_score = request.args.get('total_score', None)
         about = request.args.get('about', None)
-        entity = Entity(name, email, password, type, smart_contract, total_score, about)
-        
+        entity = Entity(name, email, password, type,
+                        smart_contract, total_score, about)
+
         db.session.add(entity)
         db.session.commit()
 
@@ -175,8 +182,8 @@ def create_record_form():
         content = request.form['businessId']
         entityId = request.form['entityId']
         product = product(score=score,
-                            content=content,
-                            entityId=entityId)
+                          content=content,
+                          entityId=entityId)
         db.session.add(product)
         db.session.commit()
         return "Successfully Added an Review"
@@ -515,5 +522,5 @@ def get_verified(params_data):
 
 
 if __name__ == '__main__':
-    create_tables()
+    # create_tables()
     api.run()
