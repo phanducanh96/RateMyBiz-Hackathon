@@ -50,16 +50,13 @@ class EntitySchema(ma.Schema):
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(25), nullable=False)
-    business_id = db.Column(
-        db.Integer)
-    image = db.Column(db.LargeBinary)
+    business_id = db.Column(db.Integer, db.ForeignKey('entity.id'), nullable=False)
     about = db.Column(db.Text)
     price = db.Column(db.Numeric(scale=2))
 
-    def __init__(self, name, business_id, image=None, about='', price=0):
+    def __init__(self, name, business_id, about='', price=None):
         self.name = name
         self.business_id = business_id
-        self.image = image
         self.about = about
         self.price = price
 
@@ -75,14 +72,12 @@ class ProductSchema(ma.Schema):
 
 class Review(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    score = db.Column(db.Integer)
+    score = db.Column(db.Integer, nullable=False)
     content = db.Column(db.Text)
-    from_entity_id = db.Column(
-        db.Integer)
-    to_entity_id = db.Column(
-        db.Integer)
+    from_entity_id = db.Column(db.Integer, db.ForeignKey('entity.id'), nullable=False)
+    to_entity_id = db.Column(db.Integer, db.ForeignKey('entity.id'), nullable=False)
 
-    def __init__(self, score, content, from_entity_id, to_entity_id):
+    def __init__(self, score, from_entity_id, to_entity_id, content=''):
         self.score = score
         self.content = content
         self.from_entity_id = from_entity_id
@@ -148,7 +143,7 @@ def get_record():
 
 
 @api.route('/api/db_create/', methods=["POST"])
-def create_record_form():
+def create_record():
     table = request.args.get('table', None)
     if table.lower() == 'entity':
         name = request.args.get('name', None)
@@ -164,18 +159,20 @@ def create_record_form():
         db.session.add(entity)
         db.session.commit()
 
-        return "Successfully Added Entity"
+        return "Successfully added entity"
 
     elif table.lower() == 'product':
         name = request.args.get('name')
-        businessId = request.args.get('businessId')
-        image = request.args.get('image')
+        businessId = request.args.get('business_id')
+        about = request.args.get('about')
+        price = request.args.get('price')
 
-        product = Product(name, businessId)
+        product = Product(name, businessId, about, price)
+
         db.session.add(product)
         db.session.commit()
 
-        return "Successfully added Product"
+        return "Successfully added product"
 
     elif table.lower() == 'review':
         score = request.form['name']
@@ -186,121 +183,119 @@ def create_record_form():
                           entityId=entityId)
         db.session.add(product)
         db.session.commit()
-        return "Successfully Added an Review"
+        return "Successfully added review"
 
     else:
         return "ERROR: invalid table name"
 
 
-# @api.route('/api/db_edit/', methods=['GET', 'POST'])
-# def edit_record_form():
-#     table = request.args.get('table', None)
-#     id = request.args.get('id', None)
-#     if request.method == "GET":
-#         record = None
-#         if table.lower() == 'entity':
-#             record = Entity.query.get_or_404(int(id))
-#         elif table.lower() == 'product':
-#             record = Product.query.get_or_404(id)
-#         elif table.lower() == 'review':
-#             record = Review.query.get_or_404(id)
-#         else:
-#             return 'ERROR: invalid table name or id'
-#         return str(record)
+@api.route('/api/db_edit/', methods=['POST'])
+def edit_record():
+    table = request.args.get('table')
+    id = request.args.get('id')
+    record = None
+    if table.lower() == 'entity':
+        record = Entity.query.get(id)
+        entity_fields = Entity.__table__.columns.keys()
+        for key in request.args:
+            if key in entity_fields:
+                setattr(record, key, request.args[key])
 
-#     if request.method == 'POST':
-#         if table.lower() == 'entity':
-#             name = request.form['name']
-#             email = request.form['email']
-#             password = int(request.form['password'])
-#             type = request.form['type']
+        db.session.commit()
+        return "Successfully updated Entity"
 
-#             record.name = name
-#             record.email = email
-#             record.password = password
-#             record.type = type
+    elif table.lower() == 'product':
+        record = Product.query.get(id)
+        product_fields = Product.__table__.columns.keys()
+        for key in request.args:
+            if key in product_fields:
+                setattr(record, key, request.args[key])
 
-#             db.session.add(record)
-#             db.session.commit()
+        db.session.commit()
+        return "Successfully updated Product"
 
-#             return redirect(url_for('index'))
+    elif table.lower() == 'review':
+        record = Review.query.get(id)
+        review_fields = Review.__table__.columns.keys()
+        for key in request.args:
+            if key in review_fields:
+                setattr(record, key, request.args[key])
 
-#     elif table.lower() == 'product':
-#         name = request.form['name']
-#         businessId = request.form['businessId']
+        db.session.commit()
+        return "Successfully updated Review"
 
-#         record.name = name
-#         record.businessId = businessId
+@api.route('/api/db_delete/', methods=['POST'])
+def delete_record():
+    table = request.args.get('table')
+    id = request.args.get('id')
+    record = None
+    if table.lower() == 'entity':
+        record = Entity.query.get(id)
+        db.session.delete(record)
+        db.session.commit()
+        return "Successfully deleted Entity"
 
-#         db.session.add(record)
-#         db.session.commit()
+    elif table.lower() == 'product':
+        record = Product.query.get(id)
+        db.session.delete(record)
+        db.session.commit()
+        return "Successfully deleted Product"
 
-#         return redirect(url_for('index'))
+    elif table.lower() == 'review':
+        record = Review.query.get(id)
+        db.session.delete(record)
+        db.session.commit()
+        return "Successfully deleted Review"
 
-#     elif table.lower() == 'review':
-#         score = request.form['score']
-#         content = request.form['content']
-#         personId = request.form['personId']
-
-#         record.score = score
-#         record.content = content
-#         record.personId = personId
-
-#         db.session.add(record)
-#         db.session.commit()
-
-#         return redirect(url_for('index'))
-
-
-@api.route('/api/db_create_entity_manual/', methods=["POST"])
-def create_record_entity_manual():
-    name = request.args.get('name', None)
-    email = request.args.get('email', None)
-    password = request.args.get('password', None)
-    type = request.args.get('type', None)
-    smart_contract = request.args.get('smart_contract', None)
-    total_score = request.args.get('total_score', None)
-    entity = Entity(name=name,
-                    email=email,
-                    password=password,
-                    type=type,
-                    smart_contract=smart_contract,
-                    total_score=total_score,
-                    about='')
-    # try:
-    db.session.add(entity)
-    db.session.commit()
-    return "Successfully Added an Entity Manually"
-    # except:
-    # return "Error Adding Entity"
+# @api.route('/api/db_create_entity_manual/', methods=["POST"])
+# def create_record_entity_manual():
+#     name = request.args.get('name', None)
+#     email = request.args.get('email', None)
+#     password = request.args.get('password', None)
+#     type = request.args.get('type', None)
+#     smart_contract = request.args.get('smart_contract', None)
+#     total_score = request.args.get('total_score', None)
+#     entity = Entity(name=name,
+#                     email=email,
+#                     password=password,
+#                     type=type,
+#                     smart_contract=smart_contract,
+#                     total_score=total_score,
+#                     about='')
+#     # try:
+#     db.session.add(entity)
+#     db.session.commit()
+#     return "Successfully Added an Entity Manually"
+#     # except:
+#     # return "Error Adding Entity"
 
 
-@api.route('/api/db_create_product_manual/', methods=["POST"])
-def create_record_product_manual():
+# @api.route('/api/db_create_product_manual/', methods=["POST"])
+# def create_record_product_manual():
 
-    name = request.args.get('name', None)
-    business_id = request.args.get('business_id', None)
-    product = Product(name=name,
-                      business_id=business_id)
+#     name = request.args.get('name', None)
+#     business_id = request.args.get('business_id', None)
+#     product = Product(name=name,
+#                       business_id=business_id)
 
-    db.session.add(product)
-    db.session.commit()
-    return "Successfully Added an Product Manually"
+#     db.session.add(product)
+#     db.session.commit()
+#     return "Successfully Added an Product Manually"
 
 
-@api.route('/api/db_create_review_manual/', methods=["POST"])
-def create_record_review_manual():
-    score = request.args.get('score', None)
-    content = request.args.get('content', None)
-    from_entity_id = request.args.get('from_entity_id', None)
-    to_entity_id = request.args.get('to_entity_id', None)
-    review = Review(score=score,
-                    content=content,
-                    from_entity_id=from_entity_id,
-                    to_entity_id=to_entity_id)
-    db.session.add(review)
-    db.session.commit()
-    return "Successfully Added an Review Manually"
+# @api.route('/api/db_create_review_manual/', methods=["POST"])
+# def create_record_review_manual():
+#     score = request.args.get('score', None)
+#     content = request.args.get('content', None)
+#     from_entity_id = request.args.get('from_entity_id', None)
+#     to_entity_id = request.args.get('to_entity_id', None)
+#     review = Review(score=score,
+#                     content=content,
+#                     from_entity_id=from_entity_id,
+#                     to_entity_id=to_entity_id)
+#     db.session.add(review)
+#     db.session.commit()
+#     return "Successfully Added an Review Manually"
 
 
 @api.route('/api/get_qr_code', methods=["GET"])
