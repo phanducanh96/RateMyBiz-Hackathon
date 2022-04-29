@@ -11,6 +11,7 @@ export class Profile extends Component {
     state = {}
     componentDidMount() {
         this.getSmartContractAddress(global.currentIdGlobal);
+        this.getPendingReviews(global.currentIdGlobal);
         this.loadBlockchainData();
     }
 
@@ -29,7 +30,7 @@ export class Profile extends Component {
             error: '',
             credentialParams: '',
             verifiedStatus: 'fail',
-            reviewPendingError: 'You have 5 Pending Reviews, please Update'
+            reviewPendingError: ''
         }
 
     }
@@ -374,6 +375,30 @@ export class Profile extends Component {
             const res = response.data
             const smartContractAddress = res.smart_contract
             this.setState({ smartContractAddress })
+            console.log(this.state.smartContractAddress)
+        }).catch((error) => {
+            if (error.response) {
+                console.log(error.response)
+                console.log(error.response.status)
+                console.log(error.response.headers)
+            }
+        });
+
+    }
+
+    getPendingReviews = async (id) => {
+
+        axios({
+            method: 'get',
+            url: '/api/db_count_review/',
+            params: { 'id': id }
+        }).then((response) => {
+            console.log(response.data)
+            const reviewsNumber = response.data[0]
+            if (reviewsNumber > 0) {
+                const reviewPendingError = "You have " + reviewsNumber + " Pending Reviews, please update!"
+                this.setState({ reviewPendingError })
+            }
             console.log(this.state.smartContractAddress)
         }).catch((error) => {
             if (error.response) {

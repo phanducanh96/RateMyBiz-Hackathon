@@ -145,14 +145,6 @@ def get_record():
         return "ERROR: invalid table name or id"
 
 
-@api.route('/api/db_get_by_email/', methods=["GET"])
-def get_current_id_by_email():
-    email = request.args.get('email', None)
-    entity = db.session.execute(
-        "SELECT * FROM entity where email = '" + email + "'")
-    entities = [row[0] for row in entity]
-    return str(entities)
-
 @api.route('/api/db_create/', methods=["POST"])
 def create_record():
     table = request.args.get('table', None)
@@ -259,55 +251,74 @@ def delete_record():
         db.session.commit()
         return "Successfully deleted Review"
 
-# @api.route('/api/db_create_entity_manual/', methods=["POST"])
-# def create_record_entity_manual():
-#     name = request.args.get('name', None)
-#     email = request.args.get('email', None)
-#     password = request.args.get('password', None)
-#     type = request.args.get('type', None)
-#     smart_contract = request.args.get('smart_contract', None)
-#     total_score = request.args.get('total_score', None)
-#     entity = Entity(name=name,
-#                     email=email,
-#                     password=password,
-#                     type=type,
-#                     smart_contract=smart_contract,
-#                     total_score=total_score,
-#                     about='')
-#     # try:
-#     db.session.add(entity)
-#     db.session.commit()
-#     return "Successfully Added an Entity Manually"
-#     # except:
-#     # return "Error Adding Entity"
+
+@api.route('/api/db_create_entity_manual/', methods=["POST"])
+def create_record_entity_manual():
+    name = request.args.get('name', None)
+    email = request.args.get('email', None)
+    password = request.args.get('password', None)
+    type = request.args.get('type', None)
+    smart_contract = request.args.get('smart_contract', None)
+    total_score = request.args.get('total_score', None)
+    entity = Entity(name=name,
+                    email=email,
+                    password=password,
+                    type=type,
+                    smart_contract=smart_contract,
+                    total_score=total_score,
+                    about='')
+    # try:
+    db.session.add(entity)
+    db.session.commit()
+    return "Successfully Added an Entity Manually"
+    # except:
+    # return "Error Adding Entity"
 
 
-# @api.route('/api/db_create_product_manual/', methods=["POST"])
-# def create_record_product_manual():
+@api.route('/api/db_create_product_manual/', methods=["POST"])
+def create_record_product_manual():
 
-#     name = request.args.get('name', None)
-#     business_id = request.args.get('business_id', None)
-#     product = Product(name=name,
-#                       business_id=business_id)
+    name = request.args.get('name', None)
+    business_id = request.args.get('business_id', None)
+    product = Product(name=name,
+                      business_id=business_id)
 
-#     db.session.add(product)
-#     db.session.commit()
-#     return "Successfully Added an Product Manually"
+    db.session.add(product)
+    db.session.commit()
+    return "Successfully Added an Product Manually"
 
 
-# @api.route('/api/db_create_review_manual/', methods=["POST"])
-# def create_record_review_manual():
-#     score = request.args.get('score', None)
-#     content = request.args.get('content', None)
-#     from_entity_id = request.args.get('from_entity_id', None)
-#     to_entity_id = request.args.get('to_entity_id', None)
-#     review = Review(score=score,
-#                     content=content,
-#                     from_entity_id=from_entity_id,
-#                     to_entity_id=to_entity_id)
-#     db.session.add(review)
-#     db.session.commit()
-#     return "Successfully Added an Review Manually"
+@api.route('/api/db_create_review_manual/', methods=["POST"])
+def create_record_review_manual():
+    score = request.args.get('score', None)
+    content = request.args.get('content', None)
+    from_entity_id = request.args.get('from_entity_id', None)
+    to_entity_id = request.args.get('to_entity_id', None)
+    review = Review(score=score,
+                    content=content,
+                    from_entity_id=from_entity_id,
+                    to_entity_id=to_entity_id)
+    db.session.add(review)
+    db.session.commit()
+    return "Successfully Added an Review Manually"
+
+
+@api.route('/api/db_get_by_email/', methods=["GET"])
+def get_current_id_by_email():
+    email = request.args.get('email', None)
+    entity = db.session.execute(
+        "SELECT * FROM entity where email = '" + email + "'")
+    entities = [row[0] for row in entity]
+    return str(entities)
+
+
+@api.route('/api/db_count_review/', methods=["GET"])
+def get_count_review():
+    id = request.args.get('id', None)
+    count_review = db.session.execute(
+        "SELECT COUNT(*) FROM review where to_entity_id = " + id)
+    count_reviews = [row[0] for row in count_review]
+    return str(count_reviews)
 
 
 @api.route('/api/get_qr_code', methods=["GET"])
