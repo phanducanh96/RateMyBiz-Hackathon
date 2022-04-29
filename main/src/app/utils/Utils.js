@@ -101,8 +101,8 @@ export const updateRecord = (tableName, record_id, ...fields) => {
 
 export const remove = (tableName, record_id) => {
     axios({
-        method: 'get',
-        url: '/api/db_get_all',
+        method: 'post',
+        url: '/api/db_delete',
         params: {
             table: tableName,
             id: record_id
