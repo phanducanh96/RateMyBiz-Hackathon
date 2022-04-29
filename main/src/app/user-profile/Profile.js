@@ -5,16 +5,19 @@ import Web3 from 'web3';
 import { Form, Alert } from 'react-bootstrap';
 import axios from 'axios';
 import { delay } from '../utils/Utils';
+import '../utils/Utils'
 
 export class Profile extends Component {
     state = {}
     componentDidMount() {
+        this.getSmartContractAddress(global.currentIdGlobal);
         this.loadBlockchainData();
     }
 
     constructor(props) {
         super(props)
         this.state = {
+            smartContractAddress: '',
             account: '',
             reviewGivenCount: 0,
             reviewReceivedCount: 0,
@@ -249,12 +252,13 @@ export class Profile extends Component {
         )
     }
 
+
     async loadBlockchainData() {
         const web3 = new Web3(Web3.givenProvider || "http://localhost:8545");
         await window.ethereum.enable();
         const accounts = await web3.eth.getAccounts();
         this.setState({ account: accounts[0] });
-        const profileDetail = new web3.eth.Contract(PROFILE_DETAIL_ABI, PROFILE_DETAIL_ADDRESS)
+        const profileDetail = new web3.eth.Contract(PROFILE_DETAIL_ABI, this.state.smartContractAddress)
         this.setState({ profileDetail })
         const reviewReceivedCount = await profileDetail.methods.reviewReceivedCount().call()
         const reviewGivenCount = await profileDetail.methods.reviewGivenCount().call()
@@ -357,6 +361,28 @@ export class Profile extends Component {
         const content = e.target.result;
         this.setState({ credentialParams: content });
         console.log(this.state.credentialParams)
+    }
+
+    getSmartContractAddress = async (id) => {
+
+        axios({
+            method: 'get',
+            url: '/api/db_get/',
+            params: { 'table': 'entity', 'id': id }
+        }).then((response) => {
+            console.log(response.data)
+            const res = response.data
+            const smartContractAddress = res.smart_contract
+            this.setState({ smartContractAddress })
+            console.log(this.state.smartContractAddress)
+        }).catch((error) => {
+            if (error.response) {
+                console.log(error.response)
+                console.log(error.response.status)
+                console.log(error.response.headers)
+            }
+        });
+
     }
 
     verification = async (verifierParams) => {

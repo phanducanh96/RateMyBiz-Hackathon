@@ -50,7 +50,8 @@ class EntitySchema(ma.Schema):
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(25), nullable=False)
-    business_id = db.Column(db.Integer, db.ForeignKey('entity.id'), nullable=False)
+    business_id = db.Column(
+        db.Integer, db.ForeignKey('entity.id'), nullable=False)
     about = db.Column(db.Text)
     price = db.Column(db.Numeric(scale=2))
 
@@ -74,8 +75,10 @@ class Review(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     score = db.Column(db.Integer, nullable=False)
     content = db.Column(db.Text)
-    from_entity_id = db.Column(db.Integer, db.ForeignKey('entity.id'), nullable=False)
-    to_entity_id = db.Column(db.Integer, db.ForeignKey('entity.id'), nullable=False)
+    from_entity_id = db.Column(
+        db.Integer, db.ForeignKey('entity.id'), nullable=False)
+    to_entity_id = db.Column(
+        db.Integer, db.ForeignKey('entity.id'), nullable=False)
 
     def __init__(self, score, from_entity_id, to_entity_id, content=''):
         self.score = score
@@ -141,6 +144,14 @@ def get_record():
     else:
         return "ERROR: invalid table name or id"
 
+
+@api.route('/api/db_get_by_email/', methods=["GET"])
+def get_current_id_by_email():
+    email = request.args.get('email', None)
+    entity = db.session.execute(
+        "SELECT * FROM entity where email = '" + email + "'")
+    entities = [row[0] for row in entity]
+    return str(entities)
 
 @api.route('/api/db_create/', methods=["POST"])
 def create_record():
@@ -223,6 +234,7 @@ def edit_record():
 
         db.session.commit()
         return "Successfully updated Review"
+
 
 @api.route('/api/db_delete/', methods=['POST'])
 def delete_record():
