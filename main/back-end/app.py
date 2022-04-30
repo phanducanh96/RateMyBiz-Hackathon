@@ -44,7 +44,7 @@ class Entity(db.Model):
 class EntitySchema(ma.Schema):
     class Meta:
         fields = ("id", "name", "email", "password",
-                        "type", "smart_contract", "date_created", "about")
+                        "type", "smart_contract", "total_score", "date_created", "about")
 
 
 class Product(db.Model):
@@ -67,7 +67,7 @@ class Product(db.Model):
 
 class ProductSchema(ma.Schema):
     class Meta:
-        fields = ("id", "name", "businessId", "image",
+        fields = ("id", "name", "business_id",
                   "about", "price")
 
 
@@ -92,8 +92,8 @@ class Review(db.Model):
 
 class ReviewSchema(ma.Schema):
     class Meta:
-        fields = ("id", "score", "content", "fromEntityId",
-                        "toEntityId")
+        fields = ("id", "score", "content", "from_entity_id",
+                        "to_entity_id")
 
 
 @api.before_first_request
@@ -166,11 +166,11 @@ def create_record():
 
     elif table.lower() == 'product':
         name = request.args.get('name')
-        businessId = request.args.get('business_id')
+        business_id = request.args.get('business_id')
         about = request.args.get('about')
         price = request.args.get('price')
 
-        product = Product(name, businessId, about, price)
+        product = Product(name, business_id, about, price)
 
         db.session.add(product)
         db.session.commit()
@@ -179,12 +179,14 @@ def create_record():
 
     elif table.lower() == 'review':
         score = request.form['name']
-        content = request.form['businessId']
-        entityId = request.form['entityId']
-        product = product(score=score,
-                          content=content,
-                          entityId=entityId)
-        db.session.add(product)
+        content = request.form['content']
+        from_entity_id = request.form['from_entity_id']
+        to_entity_id = request.form['to_entity_id']
+        review = Review(score=score,
+                        content=content,
+                        from_entity_id=from_entity_id,
+                        to_entity_id=to_entity_id)
+        db.session.add(review)
         db.session.commit()
         return "Successfully added review"
 
@@ -198,7 +200,7 @@ def edit_record():
     id = request.args.get('id')
     record = None
     if table.lower() == 'entity':
-        record = Entity.query.get(id)
+        record = Entity.query.get_or_404(id)
         entity_fields = Entity.__table__.columns.keys()
         for key in request.args:
             if key in entity_fields:
@@ -208,7 +210,7 @@ def edit_record():
         return "Successfully updated Entity"
 
     elif table.lower() == 'product':
-        record = Product.query.get(id)
+        record = Product.query.get_or_404(id)
         product_fields = Product.__table__.columns.keys()
         for key in request.args:
             if key in product_fields:
@@ -218,7 +220,7 @@ def edit_record():
         return "Successfully updated Product"
 
     elif table.lower() == 'review':
-        record = Review.query.get(id)
+        record = Review.query.get_or_404(id)
         review_fields = Review.__table__.columns.keys()
         for key in request.args:
             if key in review_fields:
@@ -226,6 +228,9 @@ def edit_record():
 
         db.session.commit()
         return "Successfully updated Review"
+
+    else:
+        return "ERROR: invalid table name"
 
 
 @api.route('/api/db_delete/', methods=['POST'])
@@ -250,6 +255,9 @@ def delete_record():
         db.session.delete(record)
         db.session.commit()
         return "Successfully deleted Review"
+
+    else:
+        return "ERROR: invalid table name"
 
 
 @api.route('/api/db_create_entity_manual/', methods=["POST"])
