@@ -329,6 +329,15 @@ def get_count_review():
     return str(count_reviews)
 
 
+@api.route('/api/db_get_pending_reviews/', methods=["GET"])
+def get_pending_reviews():
+    to_entity_id = request.args.get('to_entity_id', None)
+    review = db.session.execute(
+        "SELECT * FROM review where to_entity_id =" + to_entity_id)
+    reviews = ReviewSchema(many=True).dump(review)
+    return jsonify(reviews)
+
+
 @api.route('/api/get_qr_code', methods=["GET"])
 def api_get_qr():
     url = "http://issuer-sandbox.circle.com/api/v1/issuance/qrcode"

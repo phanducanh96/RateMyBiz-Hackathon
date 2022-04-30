@@ -46,8 +46,8 @@ export const queryTable = (tableName) => {
         params: {
             table: tableName
         }
-    }).then((res) => {
-        console.log(res.data)
+    }).then((response) => {
+        console.log(response.data)
         // Display data
     }).catch((error) => {
         if (error.response) {
@@ -66,8 +66,8 @@ export const getRecord = (tableName, recordId) => {
             table: tableName,
             id: recordId
         }
-    }).then((res) => {
-        console.log(res.data)
+    }).then((response) => {
+        console.log(response.data)
         // Display data
     }).catch((error) => {
         if (error.response) {
@@ -83,8 +83,8 @@ export const createNew = (params) => {
         method: 'post',
         url: '/api/db_create/',
         params: params
-    }).then((res) => {
-        console.log(res.data)
+    }).then((response) => {
+        console.log(response.data)
         // Display data
     }).catch((error) => {
         if (error.response) {
@@ -104,8 +104,8 @@ export const updateRecord = (tableName, record_id, ...fields) => {
             id: record_id,
             data: fields
         }
-    }).then((res) => {
-        console.log(res.data)
+    }).then((response) => {
+        console.log(response.data)
         // Display data
     }).catch((error) => {
         if (error.response) {
@@ -124,8 +124,8 @@ export const deleteRecord = (tableName, record_id) => {
             table: tableName,
             id: record_id
         }
-    }).then((res) => {
-        console.log(res.data)
+    }).then((response) => {
+        console.log(response.data)
         // Display data
     }).catch((error) => {
         if (error.response) {

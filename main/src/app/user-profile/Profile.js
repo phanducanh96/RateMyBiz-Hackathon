@@ -4,14 +4,14 @@ import { PROFILE_DETAIL_ABI } from '../../contracts-config'
 import Web3 from 'web3';
 import { Form, Alert } from 'react-bootstrap';
 import axios from 'axios';
-import { delay, updateRecord, createNew } from '../utils/Utils';
+import { delay, updateRecord, createNew, deleteRecord } from '../utils/Utils';
 import '../utils/Utils'
 
 export class Profile extends Component {
     state = {}
     componentDidMount() {
         this.getSmartContractAddress(global.currentIdGlobal);
-        this.getPendingReviews(global.currentIdGlobal);
+        this.getPendingReviewsCount(global.currentIdGlobal);
         this.loadBlockchainData();
     }
 
@@ -30,7 +30,9 @@ export class Profile extends Component {
             error: '',
             credentialParams: '',
             verifiedStatus: 'fail',
-            reviewPendingError: ''
+            reviewPendingError: '',
+            pendingReviews: [],
+            entityData: []
         }
 
     }
@@ -327,10 +329,21 @@ export class Profile extends Component {
         //Hard Code Writing to the smart contract
         if (this.state.verifiedStatus == "success") {
             try {
-                this.state.profileDetail.methods.createReviewReceived(2, "Verified Test Update", "Ace", "Customer", 12).send({ from: this.state.account })
-                    .once('receipt', (receipt) => {
-                        window.location.reload()
-                    })
+                this.getPendingReviews(global.currentIdGlobal);
+                await delay(100)
+                for (var i = 0; i < this.state.pendingReviews.length; i++) {
+                    this.getEntityRecord(this.state.pendingReviews[i].from_entity_id)
+                    await delay(100)
+                    console.log("Score: " + this.state.pendingReviews[i].score)
+                    console.log("Content: " + this.state.pendingReviews[i].content)
+                    console.log("Name: " + this.state.entityData.name)
+                    console.log("Type: " + this.state.entityData.type)
+                    console.log("Id: " + this.state.pendingReviews[i].id)
+                    this.state.profileDetail.methods.createReviewReceived(this.state.pendingReviews[i].score, this.state.pendingReviews[i].content, this.state.entityData.name, this.state.entityData.type, this.state.pendingReviews[i].id).send({ from: this.state.account })
+                        .once('receipt', (receipt) => {
+                            deleteRecord("review", this.state.pendingReviews[i].id)
+                        })
+                }
             } catch {
                 error = 'Something wrong, cannot update contract!'
             }
@@ -339,6 +352,7 @@ export class Profile extends Component {
         }
 
         this.setState({ error })
+        // window.location.reload()
     }
 
     handlePersonType = event => {
@@ -387,7 +401,7 @@ export class Profile extends Component {
 
     }
 
-    getPendingReviews = async (id) => {
+    getPendingReviewsCount = async (id) => {
 
         axios({
             method: 'get',
@@ -399,9 +413,7 @@ export class Profile extends Component {
             if (reviewsNumber > 0) {
                 const reviewPendingError = "You have " + reviewsNumber + " Pending Reviews, please update!"
                 this.setState({ reviewPendingError })
-                console.log("Hello" + this.state.reviewPendingError)
             }
-            console.log(this.state.smartContractAddress)
         }).catch((error) => {
             if (error.response) {
                 console.log(error.response)
@@ -410,6 +422,49 @@ export class Profile extends Component {
             }
         });
 
+    }
+
+    getPendingReviews = async (to_entity_id) => {
+
+        axios({
+            method: 'get',
+            url: '/api/db_get_pending_reviews/',
+            params: { 'to_entity_id': to_entity_id }
+        }).then((response) => {
+            console.log(response.data)
+            for (var i = 0; i < response.data.length; i++) {
+                const pendingReview = response.data[i];
+                this.setState({
+                    pendingReviews: [...this.state.pendingReviews, pendingReview]
+                })
+            }
+        }).catch((error) => {
+            if (error.response) {
+                console.log(error.response)
+                console.log(error.response.status)
+                console.log(error.response.headers)
+            }
+        });
+    }
+
+    getEntityRecord = (recordId) => {
+        axios({
+            method: 'get',
+            url: '/api/db_get/',
+            params: {
+                table: "entity",
+                id: recordId
+            }
+        }).then((response) => {
+            const entityData = response.data
+            this.setState({ entityData })
+        }).catch((error) => {
+            if (error.response) {
+                console.log(error.response)
+                console.log(error.response.status)
+                console.log(error.response.headers)
+            }
+        });
     }
 
     verification = async (verifierParams) => {
