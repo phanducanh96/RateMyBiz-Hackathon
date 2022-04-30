@@ -42,7 +42,7 @@ export const getCurrentId = (email) => {
 export const queryTable = (tableName) => {
     axios({
         method: 'get',
-        url: '/api/db_get_all',
+        url: '/api/db_get_all/',
         params: {
             table: tableName
         }
@@ -61,7 +61,7 @@ export const queryTable = (tableName) => {
 export const getRecord = (tableName, recordId) => {
     axios({
         method: 'get',
-        url: '/api/db_get',
+        url: '/api/db_get/',
         params: {
             table: tableName,
             id: recordId
@@ -78,14 +78,11 @@ export const getRecord = (tableName, recordId) => {
     });
 }
 
-export const createNew = (tableName, ...fields) => {
+export const createNew = (params) => {
     axios({
         method: 'post',
-        url: '/api/db_create',
-        params: {
-            table: tableName,
-            data: fields
-        }
+        url: '/api/db_create/',
+        params: params
     }).then((res) => {
         console.log(res.data)
         // Display data
@@ -101,7 +98,7 @@ export const createNew = (tableName, ...fields) => {
 export const updateRecord = (tableName, record_id, ...fields) => {
     axios({
         method: 'post',
-        url: '/api/db_edit',
+        url: '/api/db_edit/',
         params: {
             table: tableName,
             id: record_id,
@@ -119,10 +116,10 @@ export const updateRecord = (tableName, record_id, ...fields) => {
     });
 }
 
-export const remove = (tableName, record_id) => {
+export const deleteRecord = (tableName, record_id) => {
     axios({
         method: 'post',
-        url: '/api/db_delete',
+        url: '/api/db_delete/',
         params: {
             table: tableName,
             id: record_id

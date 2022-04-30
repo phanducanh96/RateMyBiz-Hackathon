@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { ProgressBar } from 'react-bootstrap';
-import { PROFILE_DETAIL_ABI, PROFILE_DETAIL_ADDRESS } from '../../contracts-config'
+import { PROFILE_DETAIL_ABI } from '../../contracts-config'
 import Web3 from 'web3';
 import axios from 'axios';
 import '../utils/Utils'

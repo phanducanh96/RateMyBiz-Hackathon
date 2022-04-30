@@ -4,7 +4,7 @@ import { PROFILE_DETAIL_ABI } from '../../contracts-config'
 import Web3 from 'web3';
 import { Form, Alert } from 'react-bootstrap';
 import axios from 'axios';
-import { delay } from '../utils/Utils';
+import { delay, updateRecord, createNew } from '../utils/Utils';
 import '../utils/Utils'
 
 export class Profile extends Component {
@@ -306,10 +306,11 @@ export class Profile extends Component {
                     .once('receipt', (receipt) => {
                         window.location.reload()
                     })
+                const params = { table: "review", score: score, content: content, from_entity_id: 1, to_entity_id: personId }
+                createNew(params);
             } catch {
-                error = 'Something wrong, cannot update contract!'
+                error = 'Something wrong, cannot update contract or update db!'
             }
-
         } else {
             error = 'Cannot Verified Identity!'
         }
@@ -398,6 +399,7 @@ export class Profile extends Component {
             if (reviewsNumber > 0) {
                 const reviewPendingError = "You have " + reviewsNumber + " Pending Reviews, please update!"
                 this.setState({ reviewPendingError })
+                console.log("Hello" + this.state.reviewPendingError)
             }
             console.log(this.state.smartContractAddress)
         }).catch((error) => {

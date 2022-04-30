@@ -137,8 +137,8 @@ def get_record():
         return jsonify(product)
 
     elif table.lower() == 'review':
-        get_review = Entity.query.get(id)
-        review = EntitySchema().dump(get_review)
+        get_review = Review.query.get(id)
+        review = ReviewSchema().dump(get_review)
         return jsonify(review)
 
     else:
@@ -165,10 +165,10 @@ def create_record():
         return "Successfully added entity"
 
     elif table.lower() == 'product':
-        name = request.args.get('name')
-        business_id = request.args.get('business_id')
-        about = request.args.get('about')
-        price = request.args.get('price')
+        name = request.args.get('name', None)
+        business_id = request.args.get('business_id', None)
+        about = request.args.get('about', None)
+        price = request.args.get('price', None)
 
         product = Product(name, business_id, about, price)
 
@@ -178,10 +178,10 @@ def create_record():
         return "Successfully added product"
 
     elif table.lower() == 'review':
-        score = request.form['name']
-        content = request.form['content']
-        from_entity_id = request.form['from_entity_id']
-        to_entity_id = request.form['to_entity_id']
+        score = request.args.get('score', None)
+        content = request.args.get('content', None)
+        from_entity_id = request.args.get('from_entity_id', None)
+        to_entity_id = request.args.get('to_entity_id', None)
         review = Review(score=score,
                         content=content,
                         from_entity_id=from_entity_id,
@@ -324,7 +324,7 @@ def get_current_id_by_email():
 def get_count_review():
     id = request.args.get('id', None)
     count_review = db.session.execute(
-        "SELECT COUNT(*) FROM review where to_entity_id = " + id)
+        "SELECT COUNT(*) FROM review where to_entity_id =" + id)
     count_reviews = [row[0] for row in count_review]
     return str(count_reviews)
 
