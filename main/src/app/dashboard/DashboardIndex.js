@@ -4,7 +4,6 @@ import '../utils/Utils'
 
 export class DashboardIndex extends Component {
     render() {
-        // console.log("Hello" + global.currentIdGlobal)
         return (
             <div>
                 <div className="row page-title-header">

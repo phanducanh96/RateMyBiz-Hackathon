@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Form } from 'react-bootstrap';
 import bsCustomFileInput from 'bs-custom-file-input';
+import '../utils/Utils'
 
 export class BusinessProfile extends Component {
     state = {
@@ -13,9 +14,6 @@ export class BusinessProfile extends Component {
         });
     };
 
-    componentDidMount() {
-        bsCustomFileInput.init()
-    }
 
     render() {
         return (
