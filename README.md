@@ -40,7 +40,7 @@ REACT_APP_FIREBASE_MEASUREMENT_ID=G-PQXM9Z1YZ1
 REACT_APP_FIREBASE_DATABASE_URL=
 ```
 
-After successfully installing everything and running all the above commands, `cd` back to `main` folder
+After successfully installing everything and running all the above commands, `cd` back to `main` folder. We need 2 terminals; one for the back-end, and one for the front-end. Run `npm start-backend` or `yarn start-backend` in Terminal 1. Run `npm start` or `yarn start` in Terminal 2.
 
 ---
 ## Project Future Roadmap
@@ -49,9 +49,9 @@ After successfully installing everything and running all the above commands, `cd
 ## License & Copyright
 MIT
 
-Duc Anh Phan, Lead Developer
+Duc Anh Phan, **Lead Developer**
 
-Zackary Muraca, Support Developer
+Zackary Muraca, **Support Developer**
 
-Brain Johnson, Support/Professional Writer 
+Brain Johnson, **Support/Professional Writer**
 
