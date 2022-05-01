@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.6.6;
 
-contract ProfileDetail {
+contract ProfileDetail2 {
     uint256 public totalScore = 0;
     uint256 public displayScore = 0;
     uint256 public reviewReceivedCount = 0;
@@ -49,11 +49,9 @@ contract ProfileDetail {
     );
 
     constructor(address _ownerAddress) public {
-        createReview(5, "My very first review", "Duc Anh", "Business", 1);
-        createReview(3, "My very second review", "Escanor", "Business", 2);
-        createReview(2, "My very third review", "Hackerman", "Customer", 3);
-        createReview(1, "My very fourth review", "Astro", "Customer", 4);
-        createReview(5, "My very fifth review", "Giga LTC", "Business", 5);
+        createReview(1, "My very first review", "Duc Anh", "Business", 1);
+        createReview(4, "My very second review", "Escanor", "Business", 2);
+        createReview(3, "My very third review", "Hackerman", "Customer", 3);
         ownerAddress = _ownerAddress;
     }
 

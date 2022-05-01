@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { ProgressBar } from 'react-bootstrap';
+import '../utils/Utils'
 
 export class DashboardIndex extends Component {
     render() {

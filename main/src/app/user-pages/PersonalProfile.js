@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Form } from 'react-bootstrap';
 import bsCustomFileInput from 'bs-custom-file-input';
+import '../utils/Utils'
 
 export class PersonalProfile extends Component {
     state = {
@@ -12,10 +13,6 @@ export class PersonalProfile extends Component {
             startDate: date
         });
     };
-
-    componentDidMount() {
-        bsCustomFileInput.init()
-    }
 
     render() {
         return (

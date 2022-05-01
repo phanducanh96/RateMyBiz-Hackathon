@@ -1,20 +1,24 @@
 import React, { Component } from 'react'
 import { ProgressBar } from 'react-bootstrap';
-import { PROFILE_DETAIL_ABI, PROFILE_DETAIL_ADDRESS } from '../../contracts-config'
+import { PROFILE_DETAIL_ABI } from '../../contracts-config'
 import Web3 from 'web3';
 import { Form, Alert } from 'react-bootstrap';
 import axios from 'axios';
-import { delay } from '../utils/Utils';
+import { delay, updateRecord, createNew, deleteRecord } from '../utils/Utils';
+import '../utils/Utils'
 
 export class Profile extends Component {
     state = {}
     componentDidMount() {
+        this.getSmartContractAddress(global.currentIdGlobal);
+        this.getPendingReviewsCount(global.currentIdGlobal);
         this.loadBlockchainData();
     }
 
     constructor(props) {
         super(props)
         this.state = {
+            smartContractAddress: '',
             account: '',
             reviewGivenCount: 0,
             reviewReceivedCount: 0,
@@ -26,7 +30,9 @@ export class Profile extends Component {
             error: '',
             credentialParams: '',
             verifiedStatus: 'fail',
-            reviewPendingError: 'You have 5 Pending Reviews, please Update'
+            reviewPendingError: '',
+            pendingReviews: [],
+            entityData: []
         }
 
     }
@@ -127,14 +133,14 @@ export class Profile extends Component {
                             <h4 className="card-title">Leave a Review</h4>
                             <form className="forms-sample" onSubmit={(event) => {
                                 event.preventDefault()
-                                this.createReview(this.state.score, this.content.value, this.toPerson.value, this.state.personType, this.personId.value)
+                                this.createReview(this.state.score, this.content.value, this.toPerson.value)
                             }}>
                                 <Form.Group>
                                     <label htmlFor="exampleInputName1">Business/Customer Name</label>
                                     <Form.Control type="text" className="form-control" id="name" placeholder="Name" ref={(input) => { this.toPerson = input }} required />
                                 </Form.Group>
 
-                                <Form.Group>
+                                {/* <Form.Group>
                                     <label htmlFor="exampleInputName1">Person ID (Temporary)</label>
                                     <Form.Control type="text" className="form-control" id="personId" placeholder="Name" ref={(input) => { this.personId = input }} required />
                                 </Form.Group>
@@ -155,7 +161,7 @@ export class Profile extends Component {
                                             Customer
                                         </label>
                                     </div>
-                                </Form.Group>
+                                </Form.Group> */}
 
                                 <Form.Group onChange={this.handleScore}>
                                     <label htmlFor="exampleInputCity1">Score</label>
@@ -249,12 +255,13 @@ export class Profile extends Component {
         )
     }
 
+
     async loadBlockchainData() {
         const web3 = new Web3(Web3.givenProvider || "http://localhost:8545");
         await window.ethereum.enable();
         const accounts = await web3.eth.getAccounts();
         this.setState({ account: accounts[0] });
-        const profileDetail = new web3.eth.Contract(PROFILE_DETAIL_ABI, PROFILE_DETAIL_ADDRESS)
+        const profileDetail = new web3.eth.Contract(PROFILE_DETAIL_ABI, this.state.smartContractAddress)
         this.setState({ profileDetail })
         const reviewReceivedCount = await profileDetail.methods.reviewReceivedCount().call()
         const reviewGivenCount = await profileDetail.methods.reviewGivenCount().call()
@@ -283,12 +290,12 @@ export class Profile extends Component {
 
     }
 
-    async createReview(score, content, toPerson, personType, personId) {
+    async createReview(score, content, toPerson) {
         console.log("Score: " + score)
         console.log("Content: " + content)
         console.log("toPerson: " + toPerson)
-        console.log("personType: " + personType)
-        console.log("personId: " + personId)
+        // console.log("personType: " + personType)
+        // console.log("personId: " + personId)
         const error = ''
         const credentialParamsJson = JSON.parse(this.state.credentialParams)
         this.verification(credentialParamsJson["vc_jwt"])
@@ -297,14 +304,18 @@ export class Profile extends Component {
 
         if (this.state.verifiedStatus == "success") {
             try {
-                this.state.profileDetail.methods.createReview(score, content, toPerson, personType, personId).send({ from: this.state.account })
+                this.getEntityRecordByName(toPerson)
+                await delay(200)
+                console.log(this.state.entityData[0].type)
+                console.log(this.state.entityData[0].id)
+                this.state.profileDetail.methods.createReview(score, content, toPerson, this.state.entityData[0].type, this.state.entityData[0].id).send({ from: this.state.account })
                     .once('receipt', (receipt) => {
-                        window.location.reload()
+                        const params = { table: "review", score: score, content: content, from_entity_id: global.currentIdGlobal, to_entity_id: this.state.entityData[0].id }
+                        createNew(params);
                     })
             } catch {
-                error = 'Something wrong, cannot update contract!'
+                error = 'Something wrong, cannot update contract or update db!'
             }
-
         } else {
             error = 'Cannot Verified Identity!'
         }
@@ -321,10 +332,24 @@ export class Profile extends Component {
         //Hard Code Writing to the smart contract
         if (this.state.verifiedStatus == "success") {
             try {
-                this.state.profileDetail.methods.createReviewReceived(2, "Verified Test Update", "Ace", "Customer", 12).send({ from: this.state.account })
-                    .once('receipt', (receipt) => {
-                        window.location.reload()
-                    })
+                this.getPendingReviews(global.currentIdGlobal);
+                await delay(100)
+                for (var i = 0; i < this.state.pendingReviews.length; i++) {
+                    this.getEntityRecordById(this.state.pendingReviews[i].from_entity_id)
+                    await delay(100)
+                    console.log("Score: " + this.state.pendingReviews[i].score)
+                    console.log("Content: " + this.state.pendingReviews[i].content)
+                    console.log("Name: " + this.state.entityData.name)
+                    console.log("Type: " + this.state.entityData.type)
+                    console.log("Id: " + this.state.pendingReviews[i].id)
+                    this.state.profileDetail.methods.createReviewReceived(this.state.pendingReviews[i].score, this.state.pendingReviews[i].content, this.state.entityData.name, this.state.entityData.type, this.state.pendingReviews[i].id).send({ from: this.state.account })
+                    // .once('receipt', (receipt) => {
+
+                    // })
+                    //Temporarily delete review no matter what
+                    const params = { table: "review", id: this.state.pendingReviews[i].id };
+                    deleteRecord(params);
+                }
             } catch {
                 error = 'Something wrong, cannot update contract!'
             }
@@ -333,6 +358,7 @@ export class Profile extends Component {
         }
 
         this.setState({ error })
+        // window.location.reload()
     }
 
     handlePersonType = event => {
@@ -357,6 +383,113 @@ export class Profile extends Component {
         const content = e.target.result;
         this.setState({ credentialParams: content });
         console.log(this.state.credentialParams)
+    }
+
+    getSmartContractAddress = async (id) => {
+
+        axios({
+            method: 'get',
+            url: '/api/db_get/',
+            params: { 'table': 'entity', 'id': id }
+        }).then((response) => {
+            console.log(response.data)
+            const res = response.data
+            const smartContractAddress = res.smart_contract
+            this.setState({ smartContractAddress })
+            console.log(this.state.smartContractAddress)
+        }).catch((error) => {
+            if (error.response) {
+                console.log(error.response)
+                console.log(error.response.status)
+                console.log(error.response.headers)
+            }
+        });
+
+    }
+
+    getPendingReviewsCount = async (id) => {
+
+        axios({
+            method: 'get',
+            url: '/api/db_count_review/',
+            params: { 'id': id }
+        }).then((response) => {
+            console.log(response.data)
+            const reviewsNumber = response.data[0]
+            if (reviewsNumber > 0) {
+                const reviewPendingError = "You have " + reviewsNumber + " Pending Reviews, please update!"
+                this.setState({ reviewPendingError })
+            }
+        }).catch((error) => {
+            if (error.response) {
+                console.log(error.response)
+                console.log(error.response.status)
+                console.log(error.response.headers)
+            }
+        });
+
+    }
+
+    getPendingReviews = async (to_entity_id) => {
+
+        axios({
+            method: 'get',
+            url: '/api/db_get_pending_reviews/',
+            params: { 'to_entity_id': to_entity_id }
+        }).then((response) => {
+            console.log(response.data)
+            for (var i = 0; i < response.data.length; i++) {
+                const pendingReview = response.data[i];
+                this.setState({
+                    pendingReviews: [...this.state.pendingReviews, pendingReview]
+                })
+            }
+        }).catch((error) => {
+            if (error.response) {
+                console.log(error.response)
+                console.log(error.response.status)
+                console.log(error.response.headers)
+            }
+        });
+    }
+
+    getEntityRecordById = (recordId) => {
+        axios({
+            method: 'get',
+            url: '/api/db_get/',
+            params: {
+                table: "entity",
+                id: recordId
+            }
+        }).then((response) => {
+            const entityData = response.data
+            this.setState({ entityData })
+        }).catch((error) => {
+            if (error.response) {
+                console.log(error.response)
+                console.log(error.response.status)
+                console.log(error.response.headers)
+            }
+        });
+    }
+
+    getEntityRecordByName = (name) => {
+        axios({
+            method: 'get',
+            url: '/api/db_get_entity_by_name/',
+            params: {
+                name: name
+            }
+        }).then((response) => {
+            const entityData = response.data
+            this.setState({ entityData })
+        }).catch((error) => {
+            if (error.response) {
+                console.log(error.response)
+                console.log(error.response.status)
+                console.log(error.response.headers)
+            }
+        });
     }
 
     verification = async (verifierParams) => {
