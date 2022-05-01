@@ -347,6 +347,14 @@ def get_entity_by_name():
     return jsonify(entity)
 
 
+@api.route('/api/db_get_businesses/', methods=["GET"])
+def get_businesses():
+    get_entities = db.session.execute(
+        "SELECT * FROM entity where type='Business'")
+    entities = EntitySchema(many=True).dump(get_entities)
+    return jsonify(entities)
+
+
 @api.route('/api/get_qr_code', methods=["GET"])
 def api_get_qr():
     url = "http://issuer-sandbox.circle.com/api/v1/issuance/qrcode"

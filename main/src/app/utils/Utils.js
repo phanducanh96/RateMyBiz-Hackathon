@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { useAuth } from '../contexts/AuthContext'
 
 global.currentUserGlobal = ''
 global.currentIdGlobal = ''
@@ -96,15 +95,11 @@ export const createNew = (params) => {
     });
 }
 
-export const updateRecord = (tableName, record_id, ...fields) => {
+export const updateRecord = (params) => {
     axios({
         method: 'post',
         url: '/api/db_edit/',
-        params: {
-            table: tableName,
-            id: record_id,
-            data: fields
-        }
+        params: params
     }).then((response) => {
         console.log(response.data)
         // Display data
