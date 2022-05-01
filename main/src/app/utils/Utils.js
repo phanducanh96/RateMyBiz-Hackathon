@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { useAuth } from '../contexts/AuthContext'
 
 global.currentUserGlobal = ''
 global.currentIdGlobal = ''
