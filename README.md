@@ -63,8 +63,8 @@ hello@gmail.com / 123456
 - Guess Feature
 - User can look at other's public profile
 - Use Verite for Logging/SignUp
-- Impliment QR Code Functionality for Verification/Login
-- Monitization with USDC
+- Implement QR Code Functionality for Verification/Login
+- Monetization with USDC
 
 ---
 ## License & Copyright
