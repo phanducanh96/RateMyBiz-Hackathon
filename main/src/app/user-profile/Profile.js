@@ -133,14 +133,14 @@ export class Profile extends Component {
                             <h4 className="card-title">Leave a Review</h4>
                             <form className="forms-sample" onSubmit={(event) => {
                                 event.preventDefault()
-                                this.createReview(this.state.score, this.content.value, this.toPerson.value, this.state.personType, this.personId.value)
+                                this.createReview(this.state.score, this.content.value, this.toPerson.value)
                             }}>
                                 <Form.Group>
                                     <label htmlFor="exampleInputName1">Business/Customer Name</label>
                                     <Form.Control type="text" className="form-control" id="name" placeholder="Name" ref={(input) => { this.toPerson = input }} required />
                                 </Form.Group>
 
-                                <Form.Group>
+                                {/* <Form.Group>
                                     <label htmlFor="exampleInputName1">Person ID (Temporary)</label>
                                     <Form.Control type="text" className="form-control" id="personId" placeholder="Name" ref={(input) => { this.personId = input }} required />
                                 </Form.Group>
@@ -161,7 +161,7 @@ export class Profile extends Component {
                                             Customer
                                         </label>
                                     </div>
-                                </Form.Group>
+                                </Form.Group> */}
 
                                 <Form.Group onChange={this.handleScore}>
                                     <label htmlFor="exampleInputCity1">Score</label>
@@ -290,12 +290,12 @@ export class Profile extends Component {
 
     }
 
-    async createReview(score, content, toPerson, personType, personId) {
+    async createReview(score, content, toPerson) {
         console.log("Score: " + score)
         console.log("Content: " + content)
         console.log("toPerson: " + toPerson)
-        console.log("personType: " + personType)
-        console.log("personId: " + personId)
+        // console.log("personType: " + personType)
+        // console.log("personId: " + personId)
         const error = ''
         const credentialParamsJson = JSON.parse(this.state.credentialParams)
         this.verification(credentialParamsJson["vc_jwt"])
@@ -304,12 +304,15 @@ export class Profile extends Component {
 
         if (this.state.verifiedStatus == "success") {
             try {
-                this.state.profileDetail.methods.createReview(score, content, toPerson, personType, personId).send({ from: this.state.account })
+                this.getEntityRecordByName(toPerson)
+                await delay(200)
+                console.log(this.state.entityData[0].type)
+                console.log(this.state.entityData[0].id)
+                this.state.profileDetail.methods.createReview(score, content, toPerson, this.state.entityData[0].type, this.state.entityData[0].id).send({ from: this.state.account })
                     .once('receipt', (receipt) => {
-                        window.location.reload()
+                        const params = { table: "review", score: score, content: content, from_entity_id: global.currentIdGlobal, to_entity_id: this.state.entityData[0].id }
+                        createNew(params);
                     })
-                const params = { table: "review", score: score, content: content, from_entity_id: 1, to_entity_id: personId }
-                createNew(params);
             } catch {
                 error = 'Something wrong, cannot update contract or update db!'
             }
@@ -332,7 +335,7 @@ export class Profile extends Component {
                 this.getPendingReviews(global.currentIdGlobal);
                 await delay(100)
                 for (var i = 0; i < this.state.pendingReviews.length; i++) {
-                    this.getEntityRecord(this.state.pendingReviews[i].from_entity_id)
+                    this.getEntityRecordById(this.state.pendingReviews[i].from_entity_id)
                     await delay(100)
                     console.log("Score: " + this.state.pendingReviews[i].score)
                     console.log("Content: " + this.state.pendingReviews[i].content)
@@ -340,9 +343,12 @@ export class Profile extends Component {
                     console.log("Type: " + this.state.entityData.type)
                     console.log("Id: " + this.state.pendingReviews[i].id)
                     this.state.profileDetail.methods.createReviewReceived(this.state.pendingReviews[i].score, this.state.pendingReviews[i].content, this.state.entityData.name, this.state.entityData.type, this.state.pendingReviews[i].id).send({ from: this.state.account })
-                        .once('receipt', (receipt) => {
-                            deleteRecord("review", this.state.pendingReviews[i].id)
-                        })
+                    // .once('receipt', (receipt) => {
+
+                    // })
+                    //Temporarily delete review no matter what
+                    const params = { table: "review", id: this.state.pendingReviews[i].id };
+                    deleteRecord(params);
                 }
             } catch {
                 error = 'Something wrong, cannot update contract!'
@@ -447,13 +453,32 @@ export class Profile extends Component {
         });
     }
 
-    getEntityRecord = (recordId) => {
+    getEntityRecordById = (recordId) => {
         axios({
             method: 'get',
             url: '/api/db_get/',
             params: {
                 table: "entity",
                 id: recordId
+            }
+        }).then((response) => {
+            const entityData = response.data
+            this.setState({ entityData })
+        }).catch((error) => {
+            if (error.response) {
+                console.log(error.response)
+                console.log(error.response.status)
+                console.log(error.response.headers)
+            }
+        });
+    }
+
+    getEntityRecordByName = (name) => {
+        axios({
+            method: 'get',
+            url: '/api/db_get_entity_by_name/',
+            params: {
+                name: name
             }
         }).then((response) => {
             const entityData = response.data

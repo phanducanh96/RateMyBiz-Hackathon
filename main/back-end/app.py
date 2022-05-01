@@ -338,6 +338,15 @@ def get_pending_reviews():
     return jsonify(reviews)
 
 
+@api.route('/api/db_get_entity_by_name/', methods=["GET"])
+def get_entity_by_name():
+    name = request.args.get('name', None)
+    get_entity = db.session.execute(
+        "SELECT * FROM entity where name ='" + name + "'")
+    entity = EntitySchema(many=True).dump(get_entity)
+    return jsonify(entity)
+
+
 @api.route('/api/get_qr_code', methods=["GET"])
 def api_get_qr():
     url = "http://issuer-sandbox.circle.com/api/v1/issuance/qrcode"
