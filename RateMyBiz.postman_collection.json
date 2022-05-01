@@ -1,0 +1,471 @@
+{
+	"info": {
+		"_postman_id": "1543776a-fcd7-42a2-acc4-adddebeaa5a2",
+		"name": "RateMyBiz",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Insert Review Manual",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "",
+						"value": "",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5000/api/db_create_review_manual/?score=4&content=Testing&from_entity_id=1&to_entity_id=2",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"db_create_review_manual",
+						""
+					],
+					"query": [
+						{
+							"key": "score",
+							"value": "4"
+						},
+						{
+							"key": "content",
+							"value": "Testing"
+						},
+						{
+							"key": "from_entity_id",
+							"value": "1"
+						},
+						{
+							"key": "to_entity_id",
+							"value": "2"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Insert Product Manual",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5000/api/db_create_product_manual/?name=Test&businessId=1",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"db_create_product_manual",
+						""
+					],
+					"query": [
+						{
+							"key": "name",
+							"value": "Test"
+						},
+						{
+							"key": "businessId",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Insert Entity Manual",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5000/api/db_create_entity_manual/?name=Hello&email=hello@gmail.com&password=123456&type=Customer&smart_contract=0x2CCaBF7Ba6a9164793b0FF4C91B6dc213960ce4C&total_score=0",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"db_create_entity_manual",
+						""
+					],
+					"query": [
+						{
+							"key": "name",
+							"value": "Hello"
+						},
+						{
+							"key": "email",
+							"value": "hello@gmail.com"
+						},
+						{
+							"key": "password",
+							"value": "123456"
+						},
+						{
+							"key": "type",
+							"value": "Customer"
+						},
+						{
+							"key": "smart_contract",
+							"value": "0x2CCaBF7Ba6a9164793b0FF4C91B6dc213960ce4C"
+						},
+						{
+							"key": "total_score",
+							"value": "0"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Query All",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5000/api/db_get_all/?table=entity",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"db_get_all",
+						""
+					],
+					"query": [
+						{
+							"key": "table",
+							"value": "entity"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get ID by Email",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5000/api/db_get_by_email/?email=phanducanh96@gmail.com",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"db_get_by_email",
+						""
+					],
+					"query": [
+						{
+							"key": "email",
+							"value": "phanducanh96@gmail.com"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Recrod",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5000/api/db_get/?table=review&id=1",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"db_get",
+						""
+					],
+					"query": [
+						{
+							"key": "table",
+							"value": "review"
+						},
+						{
+							"key": "id",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Review Pending",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5000/api/db_count_review/?id=1",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"db_count_review",
+						""
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Record",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5000/api/db_edit/?table=entity&id=4&about=Testing",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"db_edit",
+						""
+					],
+					"query": [
+						{
+							"key": "table",
+							"value": "entity"
+						},
+						{
+							"key": "id",
+							"value": "4"
+						},
+						{
+							"key": "about",
+							"value": "Testing"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add Review",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5000/api/db_create/?table=review&score=5&content=123123&from_entity_id=1&to_entity_id=4",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"db_create",
+						""
+					],
+					"query": [
+						{
+							"key": "table",
+							"value": "review"
+						},
+						{
+							"key": "score",
+							"value": "5"
+						},
+						{
+							"key": "content",
+							"value": "123123"
+						},
+						{
+							"key": "from_entity_id",
+							"value": "1"
+						},
+						{
+							"key": "to_entity_id",
+							"value": "4"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Record",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5000/api/db_delete/?table=review&id=2",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"db_delete",
+						""
+					],
+					"query": [
+						{
+							"key": "table",
+							"value": "review"
+						},
+						{
+							"key": "id",
+							"value": "2"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Pending Reviews",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5000/api/db_get_pending_reviews/?to_entity_id=2",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"db_get_pending_reviews",
+						""
+					],
+					"query": [
+						{
+							"key": "to_entity_id",
+							"value": "2"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Entity By Name",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5000/api/db_get_entity_by_name/?name=Astro",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"db_get_entity_by_name",
+						""
+					],
+					"query": [
+						{
+							"key": "name",
+							"value": "Astro"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Businesses",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5000/api/db_get_businesses/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"db_get_businesses",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
