@@ -44,6 +44,12 @@ After successfully installing everything and running all the above commands, `cd
 
 ---
 ## Project Future Roadmap
+- Refactor Code, make it cleaner 
+- Guess Feature
+- User can look at other's public profile
+- Use Verite for Logging/SignUp
+- Impliment QR Code Functionality for Verification/Login
+- Monitization with USDC
 
 ---
 ## License & Copyright
