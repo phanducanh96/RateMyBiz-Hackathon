@@ -42,6 +42,21 @@ REACT_APP_FIREBASE_DATABASE_URL=
 
 After successfully installing everything and running all the above commands, `cd` back to `main` folder. We need 2 terminals; one for the back-end, and one for the front-end. Run `npm start-backend` or `yarn start-backend` in Terminal 1. Run `npm start` or `yarn start` in Terminal 2.
 
+For Credential Login. These are current working credentials.
+
+```
+Username / Password
+phanducanh96@gmail.com / 123456
+escanor@gmail.com / 123456
+astro@gmail.com / 123456
+gigachad@gmail.com / 123456
+zack@gmail.com / 123456
+brain@gmail.com / 123456
+levihackerman@gmail.com / 123456
+aphan@uvm.edu / 123456
+hello@gmail.com / 123456
+```
+
 ---
 ## Project Future Roadmap
 - Refactor Code, make it cleaner 
