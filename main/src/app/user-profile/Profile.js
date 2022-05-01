@@ -140,29 +140,6 @@ export class Profile extends Component {
                                     <Form.Control type="text" className="form-control" id="name" placeholder="Name" ref={(input) => { this.toPerson = input }} required />
                                 </Form.Group>
 
-                                {/* <Form.Group>
-                                    <label htmlFor="exampleInputName1">Person ID (Temporary)</label>
-                                    <Form.Control type="text" className="form-control" id="personId" placeholder="Name" ref={(input) => { this.personId = input }} required />
-                                </Form.Group>
-
-                                <Form.Group onChange={this.handlePersonType}>
-                                    <label htmlFor="exampleInputCity1">Person Type (Temporary)</label>
-                                    <div className="form-check">
-                                        <label className="form-check-label">
-                                            <input type="radio" className="form-check-input" name="personTypeRadios" id="businessOption" value="Business" onClick={(value) => { this.personType = value }} required />
-                                            <i className="input-helper"></i>
-                                            Business
-                                        </label>
-                                    </div>
-                                    <div className="form-check">
-                                        <label className="form-check-label">
-                                            <input type="radio" className="form-check-input" name="personTypeRadios" id="customerOption" value="Customer" onClick={(value) => { this.personType = value }} defaultChecked required />
-                                            <i className="input-helper"></i>
-                                            Customer
-                                        </label>
-                                    </div>
-                                </Form.Group> */}
-
                                 <Form.Group onChange={this.handleScore}>
                                     <label htmlFor="exampleInputCity1">Score</label>
                                     <div className="form-check">
@@ -267,6 +244,8 @@ export class Profile extends Component {
         const reviewGivenCount = await profileDetail.methods.reviewGivenCount().call()
         const displayScore = await profileDetail.methods.displayScore().call()
         this.setState({ displayScore })
+        const params = { table: "entity", id: global.currentIdGlobal, total_score: displayScore }
+        updateRecord(params)
 
         this.setState({ reviewGivenCount })
         for (var i = 1; i <= reviewGivenCount; i++) {

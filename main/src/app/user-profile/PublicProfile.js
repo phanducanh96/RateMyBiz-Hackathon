@@ -3,6 +3,7 @@ import { ProgressBar } from 'react-bootstrap';
 import { PROFILE_DETAIL_ABI } from '../../contracts-config'
 import Web3 from 'web3';
 import axios from 'axios';
+import { updateRecord } from '../utils/Utils'
 import '../utils/Utils'
 
 export class PublicProfile extends Component {
@@ -27,7 +28,8 @@ export class PublicProfile extends Component {
             error: '',
             credentialParams: '',
             verifiedStatus: 'fail',
-            reviewPendingError: 'You have 5 Pending Reviews, please Update'
+            reviewPendingError: 'You have 5 Pending Reviews, please Update',
+            entityData: []
         }
 
     }
@@ -138,6 +140,8 @@ export class PublicProfile extends Component {
         const reviewGivenCount = await profileDetail.methods.reviewGivenCount().call()
         const displayScore = await profileDetail.methods.displayScore().call()
         this.setState({ displayScore })
+        const params = { table: "entity", id: global.currentIdGlobal, total_score: displayScore }
+        updateRecord(params)
 
         this.setState({ reviewGivenCount })
         for (var i = 1; i <= reviewGivenCount; i++) {
