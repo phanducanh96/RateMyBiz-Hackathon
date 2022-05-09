@@ -16,8 +16,6 @@ export default function Profile() {
     const [error, setError] = useState();
     const [credentialParams, setCredentialParams] = useState();
     const [pendingReviews, setPendingReviews] = useState([]);
-    const [entityData, setEntityData] = useState([]);
-
 
     async function createReview(score, content, toPerson) {
         console.log("Score: " + score);
@@ -43,8 +41,25 @@ export default function Profile() {
 
         if (verifiedStatus == "success") {
             try {
-                await getEntityRecordByName(toPerson);
-                // await delay(200);
+
+                const entityData = await axios({
+                    method: 'get',
+                    url: '/api/db_get_entity_by_name/',
+                    params: {
+                        name: toPerson
+                    }
+                }).then((response) => {
+                    const entityData = response.data;
+                    return entityData;
+                }).catch((error) => {
+                    if (error.response) {
+                        console.log(error.response);
+                        console.log(error.response.status);
+                        console.log(error.response.headers);
+                    }
+                });
+
+                console.log(entityData);
                 console.log(entityData[0].type);
                 console.log(entityData[0].id);
                 profileDetail.methods.createReview(score, content, toPerson, entityData[0].type, entityData[0].id).send({ from: account })
@@ -82,7 +97,9 @@ export default function Profile() {
         //Hard Code Writing to the smart contract
         if (verifiedStatus == "success") {
             try {
-                await getPendingReviews(currentUserId);
+                const pendingReviewsTemp = [];
+                await getPendingReviews(currentUserId, pendingReviewsTemp);
+                console.log(pendingReviewsTemp);
                 // await delay(100);
                 for (var i = 0; i < pendingReviews.length; i++) {
                     await getEntityRecordById(pendingReviews[i].from_entity_id);
@@ -92,13 +109,13 @@ export default function Profile() {
                     console.log("Name: " + entityData.name);
                     console.log("Type: " + entityData.type);
                     console.log("Id: " + pendingReviews[i].id);
-                    profileDetail.methods.createReviewReceived(pendingReviews[i].score, pendingReviews[i].content, entityData.name, entityData.type, pendingReviews[i].id).send({ from: account })
-                    // .once('receipt', (receipt) => {
+                    //     profileDetail.methods.createReviewReceived(pendingReviews[i].score, pendingReviews[i].content, entityData.name, entityData.type, pendingReviews[i].id).send({ from: account })
+                    //     // .once('receipt', (receipt) => {
 
-                    // })
-                    //Temporarily delete review no matter what
-                    const params = { table: "review", id: pendingReviews[i].id };
-                    await deleteRecord(params);
+                    //     // })
+                    //     //Temporarily delete review no matter what
+                    //     const params = { table: "review", id: pendingReviews[i].id };
+                    //     deleteRecord(params);
                 }
             } catch {
                 error = 'Something wrong, cannot update contract!';
@@ -109,12 +126,6 @@ export default function Profile() {
 
         setError(error);
         // window.location.reload()
-    }
-
-    async function handlePersonType(event) {
-        console.log(event.target.value);
-        const personType = event.target.value;
-        setPersonType(personType);
     }
 
     async function handleScore(event) {
@@ -131,26 +142,17 @@ export default function Profile() {
         }
     }
 
-    // async function handleFile(file) {
-    //     const content = file.result;
-    //     console.log(content)
-    //     setCredentialParams(content);
-    //     console.log(credentialParams)
-    // }
-
-    async function getPendingReviews(to_entity_id) {
+    async function getPendingReviews(to_entity_id, pendingReviewsTemp) {
 
         axios({
             method: 'get',
             url: '/api/db_get_pending_reviews/',
             params: { 'to_entity_id': to_entity_id }
         }).then((response) => {
-            console.log(response.data);
+            // console.log(response.data);
             for (var i = 0; i < response.data.length; i++) {
                 const pendingReview = response.data[i];
-                this.setState({
-                    pendingReviews: [...this.state.pendingReviews, pendingReview]
-                })
+                pendingReviewsTemp.push(pendingReview)
             }
         }).catch((error) => {
             if (error.response) {
@@ -171,7 +173,7 @@ export default function Profile() {
             }
         }).then((response) => {
             const entityData = response.data;
-            setEntityData(entityData);
+            return entityData;
         }).catch((error) => {
             if (error.response) {
                 console.log(error.response);
@@ -179,44 +181,6 @@ export default function Profile() {
                 console.log(error.response.headers);
             }
         });
-    }
-
-    async function getEntityRecordByName(name) {
-        axios({
-            method: 'get',
-            url: '/api/db_get_entity_by_name/',
-            params: {
-                name: name
-            }
-        }).then((response) => {
-            const entityData = response.data;
-            setEntityData(entityData);
-        }).catch((error) => {
-            if (error.response) {
-                console.log(error.response);
-                console.log(error.response.status);
-                console.log(error.response.headers);
-            }
-        });
-    }
-
-    async function verification(verifierParams) {
-
-        await axios({
-            method: 'get',
-            url: '/api/get_verified/' + verifierParams,
-        }).then((response) => {
-            console.log(response.data);
-            const verifiedStatus = response.data.status;
-            return verifiedStatus;
-        }).catch((error) => {
-            if (error.response) {
-                console.log(error.response);
-                console.log(error.response.status);
-                console.log(error.response.headers);
-            }
-        });
-
     }
 
     return (
