@@ -2,8 +2,6 @@ import React, { useRef, useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import { Form, Button, Alert } from 'react-bootstrap'
 import { useAuth } from '../contexts/AuthContext'
-import '../utils/Utils'
-import { getCurrentId } from '../utils/Utils'
 
 export default function LogIn() {
   const emailRef = useRef()
@@ -20,8 +18,6 @@ export default function LogIn() {
       setError('')
       setLoading(true)
       await login(emailRef.current.value, passwordRef.current.value)
-      global.currentUserGlobal = emailRef.current.value
-      getCurrentId(emailRef.current.value)
       history.push('/dashboard-index')
     } catch {
       setError('Failed to Sign In')
@@ -64,12 +60,6 @@ export default function LogIn() {
                   </div>
                   <a href="!#" onClick={event => event.preventDefault()} className="auth-link text-black">Forgot password?</a>
                 </div>
-
-                {/* <div className="mb-2">
-                    <button type="button" className="btn btn-block btn-facebook auth-form-btn">
-                      <i className="mdi mdi-facebook mr-2"></i>Connect using facebook
-                    </button>
-                  </div> */}
 
                 <div className="text-center mt-4 font-weight-light">
                   Don't have an account? <Link to="/signup" className="text-primary">Sign Up</Link>

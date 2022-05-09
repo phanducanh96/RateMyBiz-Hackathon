@@ -1,7 +1,6 @@
 import React from 'react'
 import { ProgressBar } from 'react-bootstrap';
 import useFetchDataDashboard from '../utils/useFetchDataDashboard';
-import '../utils/Utils';
 
 export default function DashboardIndex() {
     const { entityDatas } = useFetchDataDashboard();

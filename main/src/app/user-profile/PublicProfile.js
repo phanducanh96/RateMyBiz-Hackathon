@@ -1,10 +1,10 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import { ProgressBar } from 'react-bootstrap';
 import useFetchBlockchainData from '../utils/useFetchBlockchainData';
 import '../utils/Utils'
 
 export default function PublicProfile() {
-    const { account, displayScore, reviewGivens, receivedReviews } = useFetchBlockchainData();
+    const { account, currentUserId, profileDetail, reviewPendingError, displayScore, reviewGivens, receivedReviews } = useFetchBlockchainData();
 
     return (
         <div>

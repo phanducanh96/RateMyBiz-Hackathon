@@ -1,422 +1,151 @@
-import React, { Component } from 'react'
+import React, { useRef, useState } from 'react';
 import { ProgressBar } from 'react-bootstrap';
-import { PROFILE_DETAIL_ABI } from '../../contracts-config'
-import Web3 from 'web3';
 import { Form, Alert } from 'react-bootstrap';
 import axios from 'axios';
 import { delay, updateRecord, createNew, deleteRecord } from '../utils/Utils';
-import '../utils/Utils'
+import useFetchBlockchainData from '../utils/useFetchBlockchainData';
+import '../utils/Utils';
 
-export class Profile extends Component {
-    state = {}
-    componentDidMount() {
-        this.getSmartContractAddress(global.currentIdGlobal);
-        this.getPendingReviewsCount(global.currentIdGlobal);
-        this.loadBlockchainData();
-    }
-
-    constructor(props) {
-        super(props)
-        this.state = {
-            smartContractAddress: '',
-            account: '',
-            reviewGivenCount: 0,
-            reviewReceivedCount: 0,
-            displayScore: 0,
-            reviewGivens: [],
-            receivedReviews: [],
-            personType: 'Customer',
-            score: 5,
-            error: '',
-            credentialParams: '',
-            verifiedStatus: 'fail',
-            reviewPendingError: '',
-            pendingReviews: [],
-            entityData: []
-        }
-
-    }
-
-    render() {
-        return (
-            <div>
-                <div className="col-md-6 grid-margin stretch-card average-price-card">
-                    <div className="card text-white">
-                        <div className="card-body">
-                            <div className="d-flex justify-content-between pb-2 align-items-center">
-                                <h2 className="font-weight-semibold mb-0">{this.state.displayScore}/5</h2>
-                            </div>
-                            <div className="d-flex justify-content-between">
-                                <h5 className="font-weight-semibold mb-0">Rating Score</h5>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                < div className="col-lg-12 grid-margin stretch-card" >
-                    <div className="card">
-                        <div className="card-body">
-                            <h4 className="card-title">Reviews Received</h4>
-                            <div className="table-responsive">
-                                <table className="table table-striped">
-                                    <thead>
-                                        <tr>
-                                            <th> User </th>
-                                            <th> Business/Customer </th>
-                                            <th> Score </th>
-                                            <th> Review's Content </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {this.state.receivedReviews.map((receivedReview, key) => {
-                                            return (
-                                                <tr key={key}>
-                                                    <td className="person">
-                                                        {receivedReview.fromPerson}
-                                                    </td>
-                                                    <td> {receivedReview.personType} </td>
-                                                    <td>
-                                                        <ProgressBar variant="success" now={20 * receivedReview.score} />
-                                                    </td>
-                                                    <td> {receivedReview.content} </td>
-                                                </tr>
-                                            )
-                                        })}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div >
-
-                < div className="col-lg-12 grid-margin stretch-card" >
-
-                    <div className="card">
-                        <div className="card-body">
-                            <h4 className="card-title">Reviews Given</h4>
-                            <div className="table-responsive">
-                                <table className="table table-striped">
-                                    <thead>
-                                        <tr>
-                                            <th> User </th>
-                                            <th> Business/Customer </th>
-                                            <th> Rating </th>
-                                            <th> Review's Content </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {this.state.reviewGivens.map((reviewGiven, key) => {
-                                            return (
-                                                <tr key={key}>
-                                                    <td className="person">
-                                                        {reviewGiven.toPerson}
-                                                    </td>
-                                                    <td> {reviewGiven.personType} </td>
-                                                    <td>
-                                                        <ProgressBar variant="success" now={20 * reviewGiven.score} />
-                                                    </td>
-                                                    <td> {reviewGiven.content} </td>
-                                                </tr>
-                                            )
-                                        })}
-
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div >
-
-                <div className="col-12 grid-margin stretch-card">
-                    <div className="card">
-                        <div className="card-body">
-                            <h4 className="card-title">Leave a Review</h4>
-                            <form className="forms-sample" onSubmit={(event) => {
-                                event.preventDefault()
-                                this.createReview(this.state.score, this.content.value, this.toPerson.value)
-                            }}>
-                                <Form.Group>
-                                    <label htmlFor="exampleInputName1">Business/Customer Name</label>
-                                    <Form.Control type="text" className="form-control" id="name" placeholder="Name" ref={(input) => { this.toPerson = input }} required />
-                                </Form.Group>
-
-                                <Form.Group onChange={this.handleScore}>
-                                    <label htmlFor="exampleInputCity1">Score</label>
-                                    <div className="form-check">
-                                        <label className="form-check-label">
-                                            <input type="radio" className="form-check-input" name="ratingRadios" id="oneStar" value="1" ref={(value) => this.score} required />
-                                            <i className="input-helper"></i>
-                                            1 Star
-                                        </label>
-                                    </div>
-                                    <div className="form-check">
-                                        <label className="form-check-label">
-                                            <input type="radio" className="form-check-input" name="ratingRadios" id="twoStars" value="2" ref={(value) => this.score} required />
-                                            <i className="input-helper"></i>
-                                            2 Stars
-                                        </label>
-                                    </div>
-                                    <div className="form-check">
-                                        <label className="form-check-label">
-                                            <input type="radio" className="form-check-input" name="ratingRadios" id="threeStars" value="3" ref={(value) => this.score} required />
-                                            <i className="input-helper"></i>
-                                            3 Stars
-                                        </label>
-                                    </div>
-                                    <div className="form-check">
-                                        <label className="form-check-label">
-                                            <input type="radio" className="form-check-input" name="ratingRadios" id="fourStars" value="4" ref={(value) => this.score} required />
-                                            <i className="input-helper"></i>
-                                            4 Stars
-                                        </label>
-                                    </div>
-                                    <div className="form-check">
-                                        <label className="form-check-label">
-                                            <input type="radio" className="form-check-input" name="ratingRadios" id="fiveStars" value="5" ref={(value) => this.score} defaultChecked required />
-                                            <i className="input-helper"></i>
-                                            5 Stars
-                                        </label>
-                                    </div>
-                                </Form.Group>
+export default function Profile() {
+    const { account, currentUserId, profileDetail, reviewPendingError, displayScore, reviewGivens, receivedReviews } = useFetchBlockchainData();
+    const toPersonRef = useRef();
+    const scoreRef = useRef();
+    const contentRef = useRef();
+    const [personType, setPersonType] = useState();
+    const [score, setScore] = useState();
+    const [error, setError] = useState();
+    const [credentialParams, setCredentialParams] = useState();
+    const [pendingReviews, setPendingReviews] = useState([]);
+    const [entityData, setEntityData] = useState([]);
 
 
+    async function createReview(score, content, toPerson) {
+        console.log("Score: " + score);
+        console.log("Content: " + content);
+        console.log("toPerson: " + toPerson);
+        const credentialParamsJson = JSON.parse(credentialParams);
 
-                                <Form.Group>
-                                    <label htmlFor="exampleTextarea1">Review Content</label>
-                                    <textarea className="form-control" id="exampleTextarea1" rows="4" ref={(input) => { this.content = input }} required></textarea>
-                                </Form.Group>
+        const verifiedStatus = await axios({
+            method: 'get',
+            url: '/api/get_verified/' + credentialParamsJson["vc_jwt"],
+        }).then((response) => {
+            console.log(response.data);
+            const verifiedStatus = response.data.status;
+            return verifiedStatus;
+        }).catch((error) => {
+            if (error.response) {
+                console.log(error.response);
+                console.log(error.response.status);
+                console.log(error.response.headers);
+            }
+        });
+        console.log(verifiedStatus);
 
-                                <Form.Group>
-                                    <label>Credential Public Key</label>
-                                    <div className="custom-file">
-                                        <input type="file" onChange={e => this.onFileChange(e.target.files[0])} required />
-
-                                    </div>
-                                </Form.Group>
-                                <button type="submit" className="btn btn-primary mr-2">Submit</button>
-                                <button className="btn btn-light">Cancel</button>
-                            </form>
-                        </div>
-                    </div>
-                </div >
-
-                <div className="col-12 grid-margin stretch-card">
-                    <div className="card">
-                        <div className="card-body">
-                            <h4 className="card-title">Update Rating Score</h4>
-
-                            <form className="forms-sample" onSubmit={(event) => {
-                                event.preventDefault()
-                                this.updateReview()
-                            }}>
-                                {this.state.reviewPendingError && <Alert variant="danger">{this.state.reviewPendingError}</Alert>}
-
-                                <Form.Group>
-                                    <label>Credential Public Key</label>
-
-                                    <div className="custom-file">
-                                        <input type="file" onChange={e => this.onFileChange(e.target.files[0])} required />
-                                    </div>
-
-                                </Form.Group>
-
-                                <button type="submit" className="btn btn-primary mr-2">Update Review</button>
-                            </form>
-                        </div>
-                    </div>
-                </div >
-
-
-            </div >
-
-        )
-    }
-
-
-    async loadBlockchainData() {
-        const web3 = new Web3(Web3.givenProvider || "http://localhost:8545");
-        await window.ethereum.enable();
-        const accounts = await web3.eth.getAccounts();
-        this.setState({ account: accounts[0] });
-        const profileDetail = new web3.eth.Contract(PROFILE_DETAIL_ABI, this.state.smartContractAddress)
-        this.setState({ profileDetail })
-        const reviewReceivedCount = await profileDetail.methods.reviewReceivedCount().call()
-        const reviewGivenCount = await profileDetail.methods.reviewGivenCount().call()
-        const displayScore = await profileDetail.methods.displayScore().call()
-        this.setState({ displayScore })
-        const params = { table: "entity", id: global.currentIdGlobal, total_score: displayScore }
-        updateRecord(params)
-
-        this.setState({ reviewGivenCount })
-        for (var i = 1; i <= reviewGivenCount; i++) {
-            const reviewGiven = await profileDetail.methods.reviewGivens(i).call()
-            this.setState({
-                reviewGivens: [...this.state.reviewGivens, reviewGiven]
-            })
-        }
-        console.log("Given Reviews:")
-        console.log(this.state.reviewGivens)
-
-        this.setState({ reviewReceivedCount })
-        for (var i = 1; i <= reviewReceivedCount; i++) {
-            const receivedReview = await profileDetail.methods.receivedReviews(i).call()
-            this.setState({
-                receivedReviews: [...this.state.receivedReviews, receivedReview]
-            })
-        }
-        console.log("Received Reviews:")
-        console.log(this.state.receivedReviews)
-
-    }
-
-    async createReview(score, content, toPerson) {
-        console.log("Score: " + score)
-        console.log("Content: " + content)
-        console.log("toPerson: " + toPerson)
-        // console.log("personType: " + personType)
-        // console.log("personId: " + personId)
-        const error = ''
-        const credentialParamsJson = JSON.parse(this.state.credentialParams)
-        this.verification(credentialParamsJson["vc_jwt"])
-        await delay(1000)
-        console.log(this.state.verifiedStatus)
-
-        if (this.state.verifiedStatus == "success") {
+        if (verifiedStatus == "success") {
             try {
-                this.getEntityRecordByName(toPerson)
-                await delay(200)
-                console.log(this.state.entityData[0].type)
-                console.log(this.state.entityData[0].id)
-                this.state.profileDetail.methods.createReview(score, content, toPerson, this.state.entityData[0].type, this.state.entityData[0].id).send({ from: this.state.account })
+                await getEntityRecordByName(toPerson);
+                // await delay(200);
+                console.log(entityData[0].type);
+                console.log(entityData[0].id);
+                profileDetail.methods.createReview(score, content, toPerson, entityData[0].type, entityData[0].id).send({ from: account })
                     .once('receipt', (receipt) => {
-                        const params = { table: "review", score: score, content: content, from_entity_id: global.currentIdGlobal, to_entity_id: this.state.entityData[0].id }
+                        const params = { table: "review", score: score, content: content, from_entity_id: currentUserId, to_entity_id: entityData[0].id };
                         createNew(params);
                     })
             } catch {
-                error = 'Something wrong, cannot update contract or update db!'
+                setError('Something wrong, cannot update contract or update db!');
             }
         } else {
-            error = 'Cannot Verified Identity!'
+            setError('Cannot Verified Identity!');
         }
-        this.setState({ error })
     }
 
-    async updateReview() {
-        const error = ''
-        const credentialParamsJson = JSON.parse(this.state.credentialParams)
-        this.verification(credentialParamsJson["vc_jwt"])
-        await delay(1000)
-        console.log(this.state.verifiedStatus)
+    async function updateReview() {
+        const error = '';
+        const credentialParamsJson = JSON.parse(credentialParams);
+        const verifiedStatus = await axios({
+            method: 'get',
+            url: '/api/get_verified/' + credentialParamsJson["vc_jwt"],
+        }).then((response) => {
+            console.log(response.data);
+            const verifiedStatus = response.data.status;
+            return verifiedStatus;
+        }).catch((error) => {
+            if (error.response) {
+                console.log(error.response);
+                console.log(error.response.status);
+                console.log(error.response.headers);
+            }
+        });
+        console.log(verifiedStatus);
 
         //Hard Code Writing to the smart contract
-        if (this.state.verifiedStatus == "success") {
+        if (verifiedStatus == "success") {
             try {
-                this.getPendingReviews(global.currentIdGlobal);
-                await delay(100)
-                for (var i = 0; i < this.state.pendingReviews.length; i++) {
-                    this.getEntityRecordById(this.state.pendingReviews[i].from_entity_id)
-                    await delay(100)
-                    console.log("Score: " + this.state.pendingReviews[i].score)
-                    console.log("Content: " + this.state.pendingReviews[i].content)
-                    console.log("Name: " + this.state.entityData.name)
-                    console.log("Type: " + this.state.entityData.type)
-                    console.log("Id: " + this.state.pendingReviews[i].id)
-                    this.state.profileDetail.methods.createReviewReceived(this.state.pendingReviews[i].score, this.state.pendingReviews[i].content, this.state.entityData.name, this.state.entityData.type, this.state.pendingReviews[i].id).send({ from: this.state.account })
+                await getPendingReviews(currentUserId);
+                // await delay(100);
+                for (var i = 0; i < pendingReviews.length; i++) {
+                    await getEntityRecordById(pendingReviews[i].from_entity_id);
+                    // await delay(100);
+                    console.log("Score: " + pendingReviews[i].score);
+                    console.log("Content: " + pendingReviews[i].content);
+                    console.log("Name: " + entityData.name);
+                    console.log("Type: " + entityData.type);
+                    console.log("Id: " + pendingReviews[i].id);
+                    profileDetail.methods.createReviewReceived(pendingReviews[i].score, pendingReviews[i].content, entityData.name, entityData.type, pendingReviews[i].id).send({ from: account })
                     // .once('receipt', (receipt) => {
 
                     // })
                     //Temporarily delete review no matter what
-                    const params = { table: "review", id: this.state.pendingReviews[i].id };
-                    deleteRecord(params);
+                    const params = { table: "review", id: pendingReviews[i].id };
+                    await deleteRecord(params);
                 }
             } catch {
-                error = 'Something wrong, cannot update contract!'
+                error = 'Something wrong, cannot update contract!';
             }
         } else {
-            error = 'Cannot Verified Identity!'
+            error = 'Cannot Verified Identity!';
         }
 
-        this.setState({ error })
+        setError(error);
         // window.location.reload()
     }
 
-    handlePersonType = event => {
+    async function handlePersonType(event) {
         console.log(event.target.value);
-        const personType = event.target.value
-        this.setState({ personType })
+        const personType = event.target.value;
+        setPersonType(personType);
     }
 
-    handleScore = event => {
+    async function handleScore(event) {
         console.log(event.target.value);
-        const score = event.target.value
-        this.setState({ score })
+        const score = event.target.value;
+        setScore(score);
     }
 
-    onFileChange = (file) => {
+    async function onFileChange(file) {
         const reader = new FileReader();
-        reader.onloadend = this.handleFile;
-        reader.readAsText(file)
+        reader.readAsText(file);
+        reader.onload = function () {
+            setCredentialParams(reader.result);
+        }
     }
 
-    handleFile = (e) => {
-        const content = e.target.result;
-        this.setState({ credentialParams: content });
-        console.log(this.state.credentialParams)
-    }
+    // async function handleFile(file) {
+    //     const content = file.result;
+    //     console.log(content)
+    //     setCredentialParams(content);
+    //     console.log(credentialParams)
+    // }
 
-    getSmartContractAddress = async (id) => {
-
-        axios({
-            method: 'get',
-            url: '/api/db_get/',
-            params: { 'table': 'entity', 'id': id }
-        }).then((response) => {
-            console.log(response.data)
-            const res = response.data
-            const smartContractAddress = res.smart_contract
-            this.setState({ smartContractAddress })
-            console.log(this.state.smartContractAddress)
-        }).catch((error) => {
-            if (error.response) {
-                console.log(error.response)
-                console.log(error.response.status)
-                console.log(error.response.headers)
-            }
-        });
-
-    }
-
-    getPendingReviewsCount = async (id) => {
-
-        axios({
-            method: 'get',
-            url: '/api/db_count_review/',
-            params: { 'id': id }
-        }).then((response) => {
-            console.log(response.data)
-            const reviewsNumber = response.data[0]
-            if (reviewsNumber > 0) {
-                const reviewPendingError = "You have " + reviewsNumber + " Pending Reviews, please update!"
-                this.setState({ reviewPendingError })
-            }
-        }).catch((error) => {
-            if (error.response) {
-                console.log(error.response)
-                console.log(error.response.status)
-                console.log(error.response.headers)
-            }
-        });
-
-    }
-
-    getPendingReviews = async (to_entity_id) => {
+    async function getPendingReviews(to_entity_id) {
 
         axios({
             method: 'get',
             url: '/api/db_get_pending_reviews/',
             params: { 'to_entity_id': to_entity_id }
         }).then((response) => {
-            console.log(response.data)
+            console.log(response.data);
             for (var i = 0; i < response.data.length; i++) {
                 const pendingReview = response.data[i];
                 this.setState({
@@ -425,14 +154,14 @@ export class Profile extends Component {
             }
         }).catch((error) => {
             if (error.response) {
-                console.log(error.response)
-                console.log(error.response.status)
-                console.log(error.response.headers)
+                console.log(error.response);
+                console.log(error.response.status);
+                console.log(error.response.headers);
             }
         });
     }
 
-    getEntityRecordById = (recordId) => {
+    async function getEntityRecordById(recordId) {
         axios({
             method: 'get',
             url: '/api/db_get/',
@@ -441,18 +170,18 @@ export class Profile extends Component {
                 id: recordId
             }
         }).then((response) => {
-            const entityData = response.data
-            this.setState({ entityData })
+            const entityData = response.data;
+            setEntityData(entityData);
         }).catch((error) => {
             if (error.response) {
-                console.log(error.response)
-                console.log(error.response.status)
-                console.log(error.response.headers)
+                console.log(error.response);
+                console.log(error.response.status);
+                console.log(error.response.headers);
             }
         });
     }
 
-    getEntityRecordByName = (name) => {
+    async function getEntityRecordByName(name) {
         axios({
             method: 'get',
             url: '/api/db_get_entity_by_name/',
@@ -460,34 +189,226 @@ export class Profile extends Component {
                 name: name
             }
         }).then((response) => {
-            const entityData = response.data
-            this.setState({ entityData })
+            const entityData = response.data;
+            setEntityData(entityData);
         }).catch((error) => {
             if (error.response) {
-                console.log(error.response)
-                console.log(error.response.status)
-                console.log(error.response.headers)
+                console.log(error.response);
+                console.log(error.response.status);
+                console.log(error.response.headers);
             }
         });
     }
 
-    verification = async (verifierParams) => {
+    async function verification(verifierParams) {
 
-        axios({
+        await axios({
             method: 'get',
             url: '/api/get_verified/' + verifierParams,
         }).then((response) => {
-            console.log(response.data)
-            const verifiedStatus = response.data.status
-            this.setState({ verifiedStatus })
+            console.log(response.data);
+            const verifiedStatus = response.data.status;
+            return verifiedStatus;
         }).catch((error) => {
             if (error.response) {
-                console.log(error.response)
-                console.log(error.response.status)
-                console.log(error.response.headers)
+                console.log(error.response);
+                console.log(error.response.status);
+                console.log(error.response.headers);
             }
         });
 
     }
+
+    return (
+        <div>
+            <div className="col-md-6 grid-margin stretch-card average-price-card">
+                <div className="card text-white">
+                    <div className="card-body">
+                        <div className="d-flex justify-content-between pb-2 align-items-center">
+                            <h2 className="font-weight-semibold mb-0">{displayScore}/5</h2>
+                        </div>
+                        <div className="d-flex justify-content-between">
+                            <h5 className="font-weight-semibold mb-0">Rating Score</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            < div className="col-lg-12 grid-margin stretch-card" >
+                <div className="card">
+                    <div className="card-body">
+                        <h4 className="card-title">Reviews Received</h4>
+                        <div className="table-responsive">
+                            <table className="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th> User </th>
+                                        <th> Business/Customer </th>
+                                        <th> Score </th>
+                                        <th> Review's Content </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {receivedReviews.map((receivedReview, key) => {
+                                        return (
+                                            <tr key={key}>
+                                                <td className="person">
+                                                    {receivedReview.fromPerson}
+                                                </td>
+                                                <td> {receivedReview.personType} </td>
+                                                <td>
+                                                    <ProgressBar variant="success" now={20 * receivedReview.score} />
+                                                </td>
+                                                <td> {receivedReview.content} </td>
+                                            </tr>
+                                        )
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div >
+
+            < div className="col-lg-12 grid-margin stretch-card" >
+
+                <div className="card">
+                    <div className="card-body">
+                        <h4 className="card-title">Reviews Given</h4>
+                        <div className="table-responsive">
+                            <table className="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th> User </th>
+                                        <th> Business/Customer </th>
+                                        <th> Rating </th>
+                                        <th> Review's Content </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {reviewGivens.map((reviewGiven, key) => {
+                                        return (
+                                            <tr key={key}>
+                                                <td className="person">
+                                                    {reviewGiven.toPerson}
+                                                </td>
+                                                <td> {reviewGiven.personType} </td>
+                                                <td>
+                                                    <ProgressBar variant="success" now={20 * reviewGiven.score} />
+                                                </td>
+                                                <td> {reviewGiven.content} </td>
+                                            </tr>
+                                        )
+                                    })}
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div >
+
+            <div className="col-12 grid-margin stretch-card">
+                <div className="card">
+                    <div className="card-body">
+                        <h4 className="card-title">Leave a Review</h4>
+                        <form className="forms-sample" onSubmit={(event) => {
+                            event.preventDefault()
+                            createReview(scoreRef.current.value, contentRef.current.value, toPersonRef.current.value)
+                        }}>
+                            <Form.Group>
+                                <label htmlFor="exampleInputName1">Business/Customer Name</label>
+                                <Form.Control type="text" className="form-control" id="name" placeholder="Name" ref={toPersonRef} required />
+                            </Form.Group>
+
+                            <Form.Group onChange={handleScore}>
+                                <label htmlFor="exampleInputCity1">Score</label>
+                                <div className="form-check">
+                                    <label className="form-check-label">
+                                        <input type="radio" className="form-check-input" name="ratingRadios" id="oneStar" value="1" ref={scoreRef} required />
+                                        <i className="input-helper"></i>
+                                        1 Star
+                                    </label>
+                                </div>
+                                <div className="form-check">
+                                    <label className="form-check-label">
+                                        <input type="radio" className="form-check-input" name="ratingRadios" id="twoStars" value="2" ref={scoreRef} required />
+                                        <i className="input-helper"></i>
+                                        2 Stars
+                                    </label>
+                                </div>
+                                <div className="form-check">
+                                    <label className="form-check-label">
+                                        <input type="radio" className="form-check-input" name="ratingRadios" id="threeStars" value="3" ref={scoreRef} required />
+                                        <i className="input-helper"></i>
+                                        3 Stars
+                                    </label>
+                                </div>
+                                <div className="form-check">
+                                    <label className="form-check-label">
+                                        <input type="radio" className="form-check-input" name="ratingRadios" id="fourStars" value="4" ref={scoreRef} required />
+                                        <i className="input-helper"></i>
+                                        4 Stars
+                                    </label>
+                                </div>
+                                <div className="form-check">
+                                    <label className="form-check-label">
+                                        <input type="radio" className="form-check-input" name="ratingRadios" id="fiveStars" value="5" ref={scoreRef} defaultChecked required />
+                                        <i className="input-helper"></i>
+                                        5 Stars
+                                    </label>
+                                </div>
+                            </Form.Group>
+
+
+
+                            <Form.Group>
+                                <label htmlFor="exampleTextarea1">Review Content</label>
+                                <textarea className="form-control" id="exampleTextarea1" rows="4" ref={contentRef} required></textarea>
+                            </Form.Group>
+
+                            <Form.Group>
+                                <label>Credential Public Key</label>
+                                <div className="custom-file">
+                                    <input type="file" onChange={event => onFileChange(event.target.files[0])} required />
+
+                                </div>
+                            </Form.Group>
+                            <button type="submit" className="btn btn-primary mr-2">Submit</button>
+                            <button className="btn btn-light">Cancel</button>
+                        </form>
+                    </div>
+                </div>
+            </div >
+
+            <div className="col-12 grid-margin stretch-card">
+                <div className="card">
+                    <div className="card-body">
+                        <h4 className="card-title">Update Rating Score</h4>
+
+                        <form className="forms-sample" onSubmit={(event) => {
+                            event.preventDefault()
+                            updateReview()
+                        }}>
+                            {reviewPendingError && <Alert variant="danger">{reviewPendingError}</Alert>}
+
+                            <Form.Group>
+                                <label>Credential Public Key</label>
+
+                                <div className="custom-file">
+                                    <input type="file" onChange={event => onFileChange(event.target.files[0])} required />
+                                </div>
+
+                            </Form.Group>
+
+                            <button type="submit" className="btn btn-primary mr-2">Update Review</button>
+                        </form>
+                    </div>
+                </div>
+            </div >
+
+
+        </div >
+
+    )
 }
-export default Profile
