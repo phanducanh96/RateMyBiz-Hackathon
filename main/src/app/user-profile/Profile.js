@@ -15,9 +15,9 @@ export default function Profile() {
     const [score, setScore] = useState();
     const [error, setError] = useState();
     const [credentialParams, setCredentialParams] = useState();
-    const [pendingReviews, setPendingReviews] = useState([]);
 
     async function createReview(score, content, toPerson) {
+        const error = '';
         console.log("Score: " + score);
         console.log("Content: " + content);
         console.log("toPerson: " + toPerson);
@@ -62,17 +62,20 @@ export default function Profile() {
                 console.log(entityData);
                 console.log(entityData[0].type);
                 console.log(entityData[0].id);
-                profileDetail.methods.createReview(score, content, toPerson, entityData[0].type, entityData[0].id).send({ from: account })
+                await profileDetail.methods.createReview(score, content, toPerson, entityData[0].type, entityData[0].id).send({ from: account })
                     .once('receipt', (receipt) => {
                         const params = { table: "review", score: score, content: content, from_entity_id: currentUserId, to_entity_id: entityData[0].id };
                         createNew(params);
                     })
             } catch {
-                setError('Something wrong, cannot update contract or update db!');
+                error = 'Something wrong, cannot update contract or update db!';
             }
         } else {
-            setError('Cannot Verified Identity!');
+            error = 'Cannot Verified Identity!';
         }
+        setError(error);
+        window.location.reload()
+
     }
 
     async function updateReview() {
@@ -94,28 +97,61 @@ export default function Profile() {
         });
         console.log(verifiedStatus);
 
-        //Hard Code Writing to the smart contract
         if (verifiedStatus == "success") {
             try {
-                const pendingReviewsTemp = [];
-                await getPendingReviews(currentUserId, pendingReviewsTemp);
-                console.log(pendingReviewsTemp);
-                // await delay(100);
+                const pendingReviews = await axios({
+                    method: 'get',
+                    url: '/api/db_get_pending_reviews/',
+                    params: { 'to_entity_id': currentUserId }
+                }).then((response) => {
+                    const pendingReviews = [];
+                    for (var i = 0; i < response.data.length; i++) {
+                        const pendingReview = response.data[i];
+                        pendingReviews.push(pendingReview);
+                    }
+                    return pendingReviews;
+                }).catch((error) => {
+                    if (error.response) {
+                        console.log(error.response);
+                        console.log(error.response.status);
+                        console.log(error.response.headers);
+                    }
+                });
+
+                console.log(pendingReviews);
+
                 for (var i = 0; i < pendingReviews.length; i++) {
-                    await getEntityRecordById(pendingReviews[i].from_entity_id);
-                    // await delay(100);
+
+                    const entityData = await axios({
+                        method: 'get',
+                        url: '/api/db_get/',
+                        params: {
+                            table: "entity",
+                            id: pendingReviews[i].from_entity_id
+                        }
+                    }).then((response) => {
+                        const entityData = response.data;
+                        return entityData;
+                    }).catch((error) => {
+                        if (error.response) {
+                            console.log(error.response);
+                            console.log(error.response.status);
+                            console.log(error.response.headers);
+                        }
+                    });
+
                     console.log("Score: " + pendingReviews[i].score);
                     console.log("Content: " + pendingReviews[i].content);
                     console.log("Name: " + entityData.name);
                     console.log("Type: " + entityData.type);
                     console.log("Id: " + pendingReviews[i].id);
-                    //     profileDetail.methods.createReviewReceived(pendingReviews[i].score, pendingReviews[i].content, entityData.name, entityData.type, pendingReviews[i].id).send({ from: account })
-                    //     // .once('receipt', (receipt) => {
+                    await profileDetail.methods.createReviewReceived(pendingReviews[i].score, pendingReviews[i].content, entityData.name, entityData.type, pendingReviews[i].id).send({ from: account })
+                    // .once('receipt', (receipt) => {
 
-                    //     // })
-                    //     //Temporarily delete review no matter what
-                    //     const params = { table: "review", id: pendingReviews[i].id };
-                    //     deleteRecord(params);
+                    // })
+                    //Temporarily delete review no matter what
+                    const params = { table: "review", id: pendingReviews[i].id };
+                    deleteRecord(params);
                 }
             } catch {
                 error = 'Something wrong, cannot update contract!';
@@ -125,7 +161,7 @@ export default function Profile() {
         }
 
         setError(error);
-        // window.location.reload()
+        window.location.reload()
     }
 
     async function handleScore(event) {
@@ -140,47 +176,6 @@ export default function Profile() {
         reader.onload = function () {
             setCredentialParams(reader.result);
         }
-    }
-
-    async function getPendingReviews(to_entity_id, pendingReviewsTemp) {
-
-        axios({
-            method: 'get',
-            url: '/api/db_get_pending_reviews/',
-            params: { 'to_entity_id': to_entity_id }
-        }).then((response) => {
-            // console.log(response.data);
-            for (var i = 0; i < response.data.length; i++) {
-                const pendingReview = response.data[i];
-                pendingReviewsTemp.push(pendingReview)
-            }
-        }).catch((error) => {
-            if (error.response) {
-                console.log(error.response);
-                console.log(error.response.status);
-                console.log(error.response.headers);
-            }
-        });
-    }
-
-    async function getEntityRecordById(recordId) {
-        axios({
-            method: 'get',
-            url: '/api/db_get/',
-            params: {
-                table: "entity",
-                id: recordId
-            }
-        }).then((response) => {
-            const entityData = response.data;
-            return entityData;
-        }).catch((error) => {
-            if (error.response) {
-                console.log(error.response);
-                console.log(error.response.status);
-                console.log(error.response.headers);
-            }
-        });
     }
 
     return (
