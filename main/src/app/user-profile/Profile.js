@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 import { ProgressBar } from 'react-bootstrap';
 import { Form, Alert } from 'react-bootstrap';
 import axios from 'axios';
-import { delay, updateRecord, createNew, deleteRecord } from '../utils/Utils';
+import { createNew, deleteRecord } from '../utils/Utils';
 import useFetchBlockchainData from '../utils/useFetchBlockchainData';
 import '../utils/Utils';
 
@@ -365,9 +365,6 @@ export default function Profile() {
                     </div>
                 </div>
             </div >
-
-
         </div >
-
     )
 }
