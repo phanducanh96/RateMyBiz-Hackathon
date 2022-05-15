@@ -18,8 +18,8 @@ export const readQrCode = (srcQrImg) => {
     });
 }
 
-export const queryTable = (tableName) => {
-    axios({
+export const queryTable = async (tableName) => {
+    await axios({
         method: 'get',
         url: '/api/db_get_all/',
         params: {
@@ -37,8 +37,8 @@ export const queryTable = (tableName) => {
     });
 }
 
-export const getRecord = (tableName, recordId) => {
-    axios({
+export const getRecord = async (tableName, recordId) => {
+    await axios({
         method: 'get',
         url: '/api/db_get/',
         params: {
@@ -57,8 +57,8 @@ export const getRecord = (tableName, recordId) => {
     });
 }
 
-export const createNew = (params) => {
-    axios({
+export const createNew = async (params) => {
+    await axios({
         method: 'post',
         url: '/api/db_create/',
         params: params
@@ -74,8 +74,8 @@ export const createNew = (params) => {
     });
 }
 
-export const updateRecord = (params) => {
-    axios({
+export const updateRecord = async (params) => {
+    await axios({
         method: 'post',
         url: '/api/db_edit/',
         params: params
@@ -91,8 +91,8 @@ export const updateRecord = (params) => {
     });
 }
 
-export const deleteRecord = (params) => {
-    axios({
+export const deleteRecord = async (params) => {
+    await axios({
         method: 'post',
         url: '/api/db_delete/',
         params: params
