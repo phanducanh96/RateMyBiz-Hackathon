@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { ProgressBar } from 'react-bootstrap';
 import { Form, Alert } from 'react-bootstrap';
 import axios from 'axios';
@@ -9,15 +9,52 @@ import '../utils/Utils';
 export default function Profile() {
     const { account, currentUserId, profileDetail, reviewPendingError, displayScore, reviewGivens, receivedReviews } = useFetchBlockchainData();
     const toPersonRef = useRef();
+    const [credentialParams, setCredentialParams] = useState();
     const scoreRef = useRef();
     const contentRef = useRef();
     const [personType, setPersonType] = useState();
     const [score, setScore] = useState();
-    const [error, setError] = useState();
-    const [credentialParams, setCredentialParams] = useState();
+    const [createReviewError, setCreateReviewError] = useState('');
+    const [updateReviewError, setUpdateReviewError] = useState('');
+    const [createReviewSuccess, setCreateReviewSuccess] = useState('');
+    const [updateReviewSuccess, setUpdateReviewSuccess] = useState('');
+    const [toPersonSelect, setToPersonSelect] = useState('');
+    const [allUserNames, setAllUserNames] = useState(['']);
+
+    useEffect(() => {
+        const loadUserNameDate = async () => {
+            const allUserNames = await axios({
+                method: 'get',
+                url: '/api/db_get_all/',
+                params: {
+                    table: 'entity'
+                }
+            }).then((response) => {
+                console.log(response.data);
+                const nameArray = [];
+                for (var i = 0; i < response.data.length; i++) {
+                    if (response.data[i].id != currentUserId) {
+                        nameArray.push(response.data[i].name);
+                    }
+                }
+                return nameArray;
+            }).catch((error) => {
+                if (error.response) {
+                    console.log(error.response);
+                    console.log(error.response.status);
+                    console.log(error.response.headers);
+                }
+            });
+
+            setAllUserNames(allUserNames);
+            setToPersonSelect(allUserNames[0]);
+        }
+        loadUserNameDate();
+    }, [currentUserId]);
 
     async function createReview(score, content, toPerson) {
-        const error = '';
+        const createReviewError = '';
+        const createReviewSuccess = '';
         console.log("Score: " + score);
         console.log("Content: " + content);
         console.log("toPerson: " + toPerson);
@@ -66,20 +103,24 @@ export default function Profile() {
                     .once('receipt', (receipt) => {
                         const params = { table: "review", score: score, content: content, from_entity_id: currentUserId, to_entity_id: entityData[0].id };
                         createNew(params);
+                        createReviewSuccess = 'Successfully created a review!'
+                        createReviewError = ''
                     })
             } catch {
-                error = 'Something wrong, cannot update contract or update db!';
+                createReviewError = 'Something wrong, cannot update contract or update db!';
+                createReviewSuccess = '';
             }
         } else {
-            error = 'Cannot Verified Identity!';
+            createReviewError = 'Cannot Verified Identity!';
+            createReviewSuccess = '';
         }
-        setError(error);
-        window.location.reload()
-
+        setCreateReviewError(createReviewError);
+        setCreateReviewSuccess(createReviewSuccess);
+        // window.location.reload()
     }
 
     async function updateReview() {
-        const error = '';
+        const updateReviewError = '';
         const credentialParamsJson = JSON.parse(credentialParams);
         const verifiedStatus = await axios({
             method: 'get',
@@ -152,16 +193,21 @@ export default function Profile() {
                     //Temporarily delete review no matter what
                     const params = { table: "review", id: pendingReviews[i].id };
                     deleteRecord(params);
+                    updateReviewSuccess = 'Successfully updated reviews!';
+                    updateReviewError = '';
                 }
             } catch {
-                error = 'Something wrong, cannot update contract!';
+                updateReviewError = 'Something wrong, cannot update contract!';
+                updateReviewSuccess = '';
             }
         } else {
-            error = 'Cannot Verified Identity!';
+            updateReviewError = 'Cannot Verified Identity!';
+            updateReviewSuccess = '';
         }
 
-        setError(error);
-        window.location.reload()
+        setUpdateReviewError(updateReviewError);
+        setUpdateReviewSuccess(updateReviewSuccess);
+        // window.location.reload()
     }
 
     async function handleScore(event) {
@@ -177,6 +223,10 @@ export default function Profile() {
             setCredentialParams(reader.result);
         }
     }
+
+    const handleSelect = (value) => {
+        setToPersonSelect(value);
+    };
 
     return (
         <div>
@@ -273,11 +323,20 @@ export default function Profile() {
                         <h4 className="card-title">Leave a Review</h4>
                         <form className="forms-sample" onSubmit={(event) => {
                             event.preventDefault()
-                            createReview(scoreRef.current.value, contentRef.current.value, toPersonRef.current.value)
+                            createReview(scoreRef.current.value, contentRef.current.value, toPersonSelect)
                         }}>
+                            {createReviewError && <Alert variant="danger">{createReviewError}</Alert>}
+                            {createReviewSuccess && <Alert variant="success">{createReviewSuccess}</Alert>}
                             <Form.Group>
                                 <label htmlFor="exampleInputName1">Business/Customer Name</label>
-                                <Form.Control type="text" className="form-control" id="name" placeholder="Name" ref={toPersonRef} required />
+                                {/* <Form.Control type="text" className="form-control" id="name" placeholder="Name" ref={toPersonRef} required /> */}
+                                <select className="form-control" id="selectName" onChange={event => handleSelect(event.target.value)}>
+                                    {allUserNames.map((allUserName, key) => {
+                                        return (
+                                            <option key={key} value={allUserName}>{allUserName}</option>
+                                        )
+                                    })}
+                                </select>
                             </Form.Group>
 
                             <Form.Group onChange={handleScore}>
@@ -350,7 +409,8 @@ export default function Profile() {
                             updateReview()
                         }}>
                             {reviewPendingError && <Alert variant="danger">{reviewPendingError}</Alert>}
-
+                            {updateReviewError && <Alert variant="danger">{updateReviewError}</Alert>}
+                            {updateReviewSuccess && <Alert variant="success">{updateReviewSuccess}</Alert>}
                             <Form.Group>
                                 <label>Credential Public Key</label>
 
