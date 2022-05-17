@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { ProgressBar } from 'react-bootstrap';
 import { Form, Alert } from 'react-bootstrap';
 import axios from 'axios';
@@ -262,7 +263,11 @@ export default function Profile() {
                                         return (
                                             <tr key={key}>
                                                 <td className="person">
-                                                    {receivedReview.fromPerson}
+                                                    <Link to={
+                                                        {
+                                                            pathname: '/public-profile-view',
+                                                            state: receivedReview.fromPerson
+                                                        }}>{receivedReview.fromPerson}</Link>
                                                 </td>
                                                 <td> {receivedReview.personType} </td>
                                                 <td>
@@ -299,7 +304,11 @@ export default function Profile() {
                                         return (
                                             <tr key={key}>
                                                 <td className="person">
-                                                    {reviewGiven.toPerson}
+                                                    <Link to={
+                                                        {
+                                                            pathname: '/public-profile-view',
+                                                            state: reviewGiven.toPerson
+                                                        }}>{reviewGiven.toPerson}</Link>
                                                 </td>
                                                 <td> {reviewGiven.personType} </td>
                                                 <td>

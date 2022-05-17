@@ -1,7 +1,7 @@
-import React, { useRef } from 'react'
+import React from 'react'
+import { Link } from 'react-router-dom';
 import { ProgressBar } from 'react-bootstrap';
 import useFetchBlockchainData from '../utils/useFetchBlockchainData';
-import '../utils/Utils'
 
 export default function PublicProfile() {
     const { account, currentUserId, profileDetail, reviewPendingError, displayScore, reviewGivens, receivedReviews } = useFetchBlockchainData();
@@ -40,7 +40,11 @@ export default function PublicProfile() {
                                         return (
                                             <tr key={key}>
                                                 <td className="person">
-                                                    {receivedReview.fromPerson}
+                                                    <Link to={
+                                                        {
+                                                            pathname: '/public-profile-view',
+                                                            state: receivedReview.fromPerson
+                                                        }}>{receivedReview.fromPerson}</Link>
                                                 </td>
                                                 <td> {receivedReview.personType} </td>
                                                 <td>
@@ -77,7 +81,11 @@ export default function PublicProfile() {
                                         return (
                                             <tr key={key}>
                                                 <td className="person">
-                                                    {reviewGiven.toPerson}
+                                                    <Link to={
+                                                        {
+                                                            pathname: '/public-profile-view',
+                                                            state: reviewGiven.toPerson
+                                                        }}>{reviewGiven.toPerson}</Link>
                                                 </td>
                                                 <td> {reviewGiven.personType} </td>
                                                 <td>

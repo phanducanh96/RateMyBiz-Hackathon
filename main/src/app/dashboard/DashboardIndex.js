@@ -1,9 +1,11 @@
 import React from 'react'
+import { Link } from 'react-router-dom';
 import { ProgressBar } from 'react-bootstrap';
 import useFetchDataDashboard from '../utils/useFetchDataDashboard';
 
 export default function DashboardIndex() {
     const { entityDatas } = useFetchDataDashboard();
+
     return (
         <div>
             <div className="row page-title-header">
@@ -30,8 +32,12 @@ export default function DashboardIndex() {
                                     {entityDatas.map((entityData, key) => {
                                         return (
                                             <tr key={key}>
-                                                <td className="business">
-                                                    {entityData.name}
+                                                <td className="entityName">
+                                                    <Link to={
+                                                        {
+                                                            pathname: '/public-profile-view',
+                                                            state: entityData.name
+                                                        }}>{entityData.name}</Link>
                                                 </td>
                                                 <td>
                                                     <ProgressBar variant="success" now={20 * entityData.total_score} />

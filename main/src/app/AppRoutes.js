@@ -26,6 +26,7 @@ const Login = lazy(() => import('./user-pages/Login'));
 const Register = lazy(() => import('./user-pages/Register'));
 const Profile = lazy(() => import('./user-profile/Profile'));
 const PublicProfile = lazy(() => import('./user-profile/PublicProfile'));
+const PublicProfileView = lazy(() => import('./user-profile/PublicProfileView'));
 
 const QrCode = lazy(() => import('./user-pages/QrCode'));
 const QrReader = lazy(() => import('./user-pages/QrReader'));
@@ -37,7 +38,6 @@ const PersonalProfile = lazy(() => import('./user-pages/PersonalProfile'));
 class AppRoutes extends Component {
 
   render() {
-    console.log("TEST" + this.props.reviewGivens)
     return (
       <Suspense fallback={<Spinner />}>
         <Switch>
@@ -61,6 +61,7 @@ class AppRoutes extends Component {
           <Route path="/signup" component={Register} />
           <Route path="/profile" component={Profile} />
           <Route path="/public-profile" component={PublicProfile} />
+          <Route path="/public-profile-view" component={PublicProfileView} />
 
           <Route path="/qr-code" component={QrCode} />
           <Route path="/qr-reader" component={QrReader} />
