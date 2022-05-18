@@ -10,7 +10,7 @@ export default function PublicProfileView() {
     const [displayScore, setDisplayScore] = useState(0);
     const [reviewGivens, setReviewGivens] = useState([]);
     const [receivedReviews, setReceivedReviews] = useState([]);
-    // const [entityData, setEntityData] = useState();
+    const [entityData, setEntityData] = useState();
     const location = useLocation();
 
     useEffect(() => {
@@ -33,7 +33,7 @@ export default function PublicProfileView() {
                 }
             });
             console.log(entityData[0].id);
-            // setEntityData(entityData);
+            setEntityData(entityData);
 
             const smartContractAddress = await axios({
                 method: 'get',
@@ -93,6 +93,16 @@ export default function PublicProfileView() {
                         <div className="d-flex justify-content-between">
                             <h5 className="font-weight-semibold mb-0">Rating Score</h5>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="col-lg-12 grid-margin stretch-card">
+                <div className="card">
+                    <div className="card-body">
+                        {entityData && <h4>Name: {entityData[0].name}</h4>}
+                        {entityData && <h5>Type: {entityData[0].type}</h5>}
+                        {entityData && <h5>Description: {entityData[0].about}</h5>}
                     </div>
                 </div>
             </div>
