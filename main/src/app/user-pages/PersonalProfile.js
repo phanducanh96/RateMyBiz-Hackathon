@@ -13,6 +13,7 @@ export default function PersonalProfile() {
     const [passwordValue, setPasswordValue] = useState('');
     const [accountTypeValue, setAccountTypeValue] = useState('');
     const [aboutValue, setAboutValue] = useState('');
+    const [avatar, setAvatar] = useState();
     const nameRef = useRef();
     const emailRef = useRef();
     const passwordRef = useRef();
@@ -74,11 +75,27 @@ export default function PersonalProfile() {
 
     }, []);
 
+    useEffect(() => {
+        return () => {
+            avatar && URL.revokeObjectURL(avatar.preview);
+        }
+    }, [avatar]);
+
     async function onFileChange(file) {
         const reader = new FileReader();
         reader.readAsText(file);
         reader.onload = function () {
             setCredentialParams(reader.result);
+        }
+    };
+
+    async function onImgPreview(event) {
+
+        const file = event.target.files[0];
+
+        if (file) {
+            file.preview = URL.createObjectURL(file);
+            setAvatar(file)
         }
     };
 
@@ -159,6 +176,15 @@ export default function PersonalProfile() {
                         <Form.Group>
                             <label htmlFor="inputAbout">About</label>
                             <textarea className="form-control" id="inputAbout" rows="4" ref={aboutRef} defaultValue={aboutValue}></textarea>
+                        </Form.Group>
+                        <Form.Group>
+                            <label>Profile Picture</label>
+                            <div className="profile-img-file">
+                                <input type="file" onChange={onImgPreview} required />
+                            </div>
+                            <div id="picPreview">
+                                {avatar && (<img src={avatar.preview} alt="" width={250} height={250} />)}
+                            </div>
                         </Form.Group>
                         <Form.Group>
                             <label>Credential Public Key</label>

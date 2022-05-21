@@ -27,8 +27,9 @@ class Entity(db.Model):
     date_created = db.Column(
         db.DateTime, default=datetime.utcnow(), nullable=True)
     about = db.Column(db.Text, nullable=True)
+    profile_img_data = db.Column(db.String(200), nullable=True)
 
-    def __init__(self, name, email, password, type, smart_contract, total_score, about):
+    def __init__(self, name, email, password, type, smart_contract, total_score, about, profile_img_data):
         self.name = name
         self.email = email
         self.password = password
@@ -36,6 +37,7 @@ class Entity(db.Model):
         self.smart_contract = smart_contract
         self.total_score = total_score
         self.about = about
+        self.profile_img_data = profile_img_data
 
     def __repr__(self):
         return '<Entity %r>' % self.id
@@ -44,7 +46,7 @@ class Entity(db.Model):
 class EntitySchema(ma.Schema):
     class Meta:
         fields = ("id", "name", "email", "password",
-                        "type", "smart_contract", "total_score", "date_created", "about")
+                        "type", "smart_contract", "total_score", "date_created", "about", "profile_img_data")
 
 
 class Product(db.Model):
@@ -99,6 +101,11 @@ class ReviewSchema(ma.Schema):
 @api.before_first_request
 def create_tables():
     db.create_all()
+
+
+def modify_table():
+    db.session.execute(
+        "ALTER TABLE entity add column profile_img_data String(200)")
 
 
 @api.route('/api/db_get_all/', methods=["GET"])
@@ -156,8 +163,9 @@ def create_record():
         smart_contract = request.args.get('smart_contract', None)
         total_score = request.args.get('total_score', None)
         about = request.args.get('about', None)
+        profile_img_data = request.args.get('profile_img_data', None)
         entity = Entity(name, email, password, type,
-                        smart_contract, total_score, about)
+                        smart_contract, total_score, about, profile_img_data)
 
         db.session.add(entity)
         db.session.commit()
@@ -575,4 +583,5 @@ def get_verified(params_data):
 
 if __name__ == '__main__':
     # create_tables()
+    # modify_table()
     api.run()
