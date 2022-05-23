@@ -1,7 +1,8 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Response
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from flask_marshmallow import Marshmallow
+from werkzeug.utils import secure_filename
 import requests
 import json
 import sys
@@ -27,9 +28,8 @@ class Entity(db.Model):
     date_created = db.Column(
         db.DateTime, default=datetime.utcnow(), nullable=True)
     about = db.Column(db.Text, nullable=True)
-    profile_img_data = db.Column(db.String(200), nullable=True)
 
-    def __init__(self, name, email, password, type, smart_contract, total_score, about, profile_img_data):
+    def __init__(self, name, email, password, type, smart_contract, total_score, about):
         self.name = name
         self.email = email
         self.password = password
@@ -37,7 +37,6 @@ class Entity(db.Model):
         self.smart_contract = smart_contract
         self.total_score = total_score
         self.about = about
-        self.profile_img_data = profile_img_data
 
     def __repr__(self):
         return '<Entity %r>' % self.id
@@ -46,7 +45,27 @@ class Entity(db.Model):
 class EntitySchema(ma.Schema):
     class Meta:
         fields = ("id", "name", "email", "password",
-                        "type", "smart_contract", "total_score", "date_created", "about", "profile_img_data")
+                        "type", "smart_contract", "total_score", "date_created", "about")
+
+
+class EntityProfilePic(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.Text, nullable=False)
+    img = db.Column(db.Text, nullable=False)
+    img_type = db.Column(db.Text, nullable=False)
+
+    def __init__(self, img, name, img_type):
+        self.name = name
+        self.img = img
+        self.img_type = img_type
+
+    def __repr__(self):
+        return '<EntityProfilePic %r>' % self.id
+
+
+class EntityProfilePicSchema(ma.Schema):
+    class Meta:
+        fields = ("id", "img", "name", "img_type")
 
 
 class Product(db.Model):
@@ -104,16 +123,24 @@ def create_tables():
 
 
 def modify_table():
+    # db.session.execute(
+    #     "ALTER TABLE entity add column profile_img_data LargeBinary")
     db.session.execute(
-        "ALTER TABLE entity add column profile_img_data String(200)")
+        "ALTER TABLE entity drop column profile_img_data")
 
 
 @api.route('/api/db_get_all/', methods=["GET"])
 def query_all():
     table = request.args.get('table', None)
+
     if table.lower() == 'entity':
         get_entities = Entity.query.all()
         entities = EntitySchema(many=True).dump(get_entities)
+        return jsonify(entities)
+
+    elif table.lower() == 'entityprofilepic':
+        get_entities = EntityProfilePic.query.all()
+        entities = EntityProfilePicSchema(many=True).dump(get_entities)
         return jsonify(entities)
 
     elif table.lower() == 'product':
@@ -163,14 +190,22 @@ def create_record():
         smart_contract = request.args.get('smart_contract', None)
         total_score = request.args.get('total_score', None)
         about = request.args.get('about', None)
-        profile_img_data = request.args.get('profile_img_data', None)
         entity = Entity(name, email, password, type,
-                        smart_contract, total_score, about, profile_img_data)
+                        smart_contract, total_score, about)
 
         db.session.add(entity)
         db.session.commit()
 
         return "Successfully added entity"
+
+    elif table.lower() == 'entityprofilepic':
+
+        entity_pic = EntityProfilePic('', '', '')
+
+        db.session.add(entity_pic)
+        db.session.commit()
+
+        return "Successfully added profile pic record"
 
     elif table.lower() == 'product':
         name = request.args.get('name', None)
@@ -217,6 +252,23 @@ def edit_record():
         db.session.commit()
         return "Successfully updated Entity"
 
+    elif table.lower() == 'entityprofilepic':
+        record = EntityProfilePic.query.get_or_404(id)
+        pic = request.files['pic']
+
+        if not pic:
+            return 'No pic uploaded', 400
+
+        name = secure_filename(pic.filename)
+        img_type = pic.mimetype
+
+        setattr(record, 'name', name)
+        setattr(record, 'img', pic.read())
+        setattr(record, 'img_type', img_type)
+
+        db.session.commit()
+        return "Successfully updated Profile Pic"
+
     elif table.lower() == 'product':
         record = Product.query.get_or_404(id)
         product_fields = Product.__table__.columns.keys()
@@ -239,6 +291,38 @@ def edit_record():
 
     else:
         return "ERROR: invalid table name"
+
+
+@api.route('/api/db_edit_pic/', methods=['POST'])
+def edit_profile_pic():
+    id = request.args.get('id')
+    record = EntityProfilePic.query.get_or_404(id)
+    print("Hello")
+    pic = request.files['pic']
+    print(pic)
+    if not pic:
+        return 'No pic uploaded', 400
+
+    name = secure_filename(pic.filename)
+    img_type = pic.mimetype
+
+    setattr(record, 'name', name)
+    setattr(record, 'img', pic.read())
+    setattr(record, 'img_type', img_type)
+
+    db.session.commit()
+    return "Successfully updated Profile Pic"
+
+
+@api.route('/api/db_get_pic/', methods=['GET'])
+def get_profile_pic():
+    id = request.args.get('id')
+    img = EntityProfilePic.query.filter_by(id=id).first()
+
+    if not img:
+        return 'No Profile Pic with this id', 404
+
+    return Response(img.img, mimetype=img.img_type)
 
 
 @api.route('/api/db_delete/', methods=['POST'])

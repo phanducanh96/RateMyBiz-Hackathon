@@ -63,6 +63,30 @@ export default function PersonalProfile() {
                         console.log(error.response.headers)
                     }
                 });
+
+            const loadProfilePic =
+                await axios({
+                    method: 'get',
+                    url: '/api/db_get_pic/',
+                    params: {
+                        id: currentUserId
+                    },
+                    responseType: 'blob'
+                }).then((response) => {
+                    console.log(response.data)
+                    return response.data;
+                    // Display data
+                }).catch((error) => {
+                    if (error.response) {
+                        console.log(error.response)
+                        console.log(error.response.status)
+                        console.log(error.response.headers)
+                    }
+                });
+
+            loadProfilePic.preview = URL.createObjectURL(loadProfilePic);
+            setAvatar(loadProfilePic);
+
             setAccountTypeValue(entityData.type);
             setNameValue(entityData.name);
             setEmailValue(entityData.email);
@@ -126,8 +150,29 @@ export default function PersonalProfile() {
         if (verifiedStatus == "success") {
             try {
                 setError('')
-                const params = { table: "entity", id: currentUserId, name: nameRef.current.value, email: emailRef.current.value, password: passwordRef.current.value, type: accountTypeValue, about: aboutRef.current.value };
-                updateRecord(params);
+                // const params = { table: "entity", id: currentUserId, name: nameRef.current.value, email: emailRef.current.value, password: passwordRef.current.value, type: accountTypeValue, about: aboutRef.current.value};
+                // updateRecord(params);
+
+                const formData = new FormData();
+                formData.append('pic', avatar);
+
+                await axios({
+                    method: 'post',
+                    url: '/api/db_edit_pic/',
+                    headers: { "Content-Type": "multipart/form-data" },
+                    params: { id: currentUserId },
+                    data: formData
+                }).then((response) => {
+                    console.log(response.data)
+                    // Display data
+                }).catch((error) => {
+                    if (error.response) {
+                        console.log(error.response)
+                        console.log(error.response.status)
+                        console.log(error.response.headers)
+                    }
+                });
+
                 setSuccess('Info updated successfully');
             } catch {
                 setSuccess('');
@@ -136,7 +181,7 @@ export default function PersonalProfile() {
         }
 
     };
-
+    console.log(avatar)
     return (
         <div className="col-12 grid-margin stretch-card">
             <div className="card">

@@ -78,6 +78,7 @@ export const updateRecord = async (params) => {
     await axios({
         method: 'post',
         url: '/api/db_edit/',
+        headers: { "Content-Type": "multipart/form-data" },
         params: params
     }).then((response) => {
         console.log(response.data)
