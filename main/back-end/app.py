@@ -138,11 +138,6 @@ def query_all():
         entities = EntitySchema(many=True).dump(get_entities)
         return jsonify(entities)
 
-    elif table.lower() == 'entityprofilepic':
-        get_entities = EntityProfilePic.query.all()
-        entities = EntityProfilePicSchema(many=True).dump(get_entities)
-        return jsonify(entities)
-
     elif table.lower() == 'product':
         get_products = Product.query.all()
         products = ProductSchema(many=True).dump(get_products)
@@ -251,23 +246,6 @@ def edit_record():
 
         db.session.commit()
         return "Successfully updated Entity"
-
-    elif table.lower() == 'entityprofilepic':
-        record = EntityProfilePic.query.get_or_404(id)
-        pic = request.files['pic']
-
-        if not pic:
-            return 'No pic uploaded', 400
-
-        name = secure_filename(pic.filename)
-        img_type = pic.mimetype
-
-        setattr(record, 'name', name)
-        setattr(record, 'img', pic.read())
-        setattr(record, 'img_type', img_type)
-
-        db.session.commit()
-        return "Successfully updated Profile Pic"
 
     elif table.lower() == 'product':
         record = Product.query.get_or_404(id)

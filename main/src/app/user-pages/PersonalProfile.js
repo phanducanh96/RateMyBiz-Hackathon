@@ -150,8 +150,8 @@ export default function PersonalProfile() {
         if (verifiedStatus == "success") {
             try {
                 setError('')
-                // const params = { table: "entity", id: currentUserId, name: nameRef.current.value, email: emailRef.current.value, password: passwordRef.current.value, type: accountTypeValue, about: aboutRef.current.value};
-                // updateRecord(params);
+                const params = { table: "entity", id: currentUserId, name: nameRef.current.value, email: emailRef.current.value, password: passwordRef.current.value, type: accountTypeValue, about: aboutRef.current.value };
+                await updateRecord(params);
 
                 const formData = new FormData();
                 formData.append('pic', avatar);
