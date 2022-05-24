@@ -11,6 +11,7 @@ export default function PublicProfileView() {
     const [reviewGivens, setReviewGivens] = useState([]);
     const [receivedReviews, setReceivedReviews] = useState([]);
     const [entityData, setEntityData] = useState();
+    const [avatar, setAvatar] = useState();
     const location = useLocation();
 
     useEffect(() => {
@@ -51,6 +52,36 @@ export default function PublicProfileView() {
                 }
             });
 
+            const loadProfilePic =
+                await axios({
+                    method: 'get',
+                    url: '/api/db_get_pic/',
+                    params: {
+                        id: entityData[0].id
+                    },
+                    responseType: 'blob'
+                }).then((response) => {
+                    console.log(response.data)
+                    return response.data;
+                    // Display data
+                }).catch((error) => {
+                    if (error.response) {
+                        console.log(error.response)
+                        console.log(error.response.status)
+                        console.log(error.response.headers)
+                    }
+                });
+            if (loadProfilePic.size != 0) {
+                loadProfilePic.preview = URL.createObjectURL(loadProfilePic);
+                setAvatar(loadProfilePic);
+            } else {
+                setAvatar();
+            }
+
+            // else {
+            //     loadProfilePic.preview = "../../assets/images/faces/default.jpg"
+            // }
+
             const web3 = new Web3(Web3.givenProvider || "http://localhost:8545");
             await window.ethereum.enable();
             const profileDetail = new web3.eth.Contract(PROFILE_DETAIL_ABI, smartContractAddress);
@@ -82,6 +113,12 @@ export default function PublicProfileView() {
         loadBlockchainDataView();
     }, [location]);
 
+    useEffect(() => {
+        return () => {
+            avatar && URL.revokeObjectURL(avatar.preview);
+        }
+    }, [avatar]);
+
     return (
         <div>
             <div className="col-md-6 grid-margin stretch-card average-price-card">
@@ -100,9 +137,19 @@ export default function PublicProfileView() {
             <div className="col-lg-12 grid-margin stretch-card">
                 <div className="card">
                     <div className="card-body">
-                        {entityData && <h4>Name: {entityData[0].name}</h4>}
-                        {entityData && <h5>Type: {entityData[0].type}</h5>}
-                        {entityData && <h5>Description: {entityData[0].about}</h5>}
+                        <table className="table">
+                            <tr>
+                                <td>
+                                    {entityData && <h4>Name: {entityData[0].name}</h4>}
+                                    {entityData && <h5>Type: {entityData[0].type}</h5>}
+                                    {entityData && <h5>Description: {entityData[0].about}</h5>}
+                                </td>
+                                <td>
+                                    {avatar && (<img src={avatar.preview} />)}
+                                    {!avatar && (<img src={require("../../assets/images/faces/default.jpg")} />)}
+                                </td>
+                            </tr>
+                        </table>
                     </div>
                 </div>
             </div>

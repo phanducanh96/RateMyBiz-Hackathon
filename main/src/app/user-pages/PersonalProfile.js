@@ -83,9 +83,10 @@ export default function PersonalProfile() {
                         console.log(error.response.headers)
                     }
                 });
-
-            loadProfilePic.preview = URL.createObjectURL(loadProfilePic);
-            setAvatar(loadProfilePic);
+            if (loadProfilePic.size != 0) {
+                loadProfilePic.preview = URL.createObjectURL(loadProfilePic);
+                setAvatar(loadProfilePic);
+            }
 
             setAccountTypeValue(entityData.type);
             setNameValue(entityData.name);
