@@ -78,10 +78,6 @@ export default function PublicProfileView() {
                 setAvatar();
             }
 
-            // else {
-            //     loadProfilePic.preview = "../../assets/images/faces/default.jpg"
-            // }
-
             const web3 = new Web3(Web3.givenProvider || "http://localhost:8545");
             await window.ethereum.enable();
             const profileDetail = new web3.eth.Contract(PROFILE_DETAIL_ABI, smartContractAddress);
@@ -138,17 +134,19 @@ export default function PublicProfileView() {
                 <div className="card">
                     <div className="card-body">
                         <table className="table">
-                            <tr>
-                                <td>
-                                    {entityData && <h4>Name: {entityData[0].name}</h4>}
-                                    {entityData && <h5>Type: {entityData[0].type}</h5>}
-                                    {entityData && <h5>Description: {entityData[0].about}</h5>}
-                                </td>
-                                <td>
-                                    {avatar && (<img src={avatar.preview} />)}
-                                    {!avatar && (<img src={require("../../assets/images/faces/default.jpg")} />)}
-                                </td>
-                            </tr>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        {entityData && <h4>Name: {entityData[0].name}</h4>}
+                                        {entityData && <h5>Type: {entityData[0].type}</h5>}
+                                        {entityData && <h5>Description: {entityData[0].about}</h5>}
+                                    </td>
+                                    <td>
+                                        {avatar && (<img src={avatar.preview} />)}
+                                        {!avatar && (<img src={require("../../assets/images/faces/default.jpg")} />)}
+                                    </td>
+                                </tr>
+                            </tbody>
                         </table>
                     </div>
                 </div>
