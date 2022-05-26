@@ -117,6 +117,23 @@ class ReviewSchema(ma.Schema):
                         "to_entity_id")
 
 
+class PendingSmartContractRequest(db.Model):
+    email = db.Column(db.String(50), primary_key=True)
+    status = db.Column(db.Text, nullable=False)
+
+    def __init__(self, email, status):
+        self.email = email
+        self.status = status
+
+    def __repr__(self):
+        return '<PendingSmartContractRequest %r>' % self.email
+
+
+class PendingSmartContractRequestSchema(ma.Schema):
+    class Meta:
+        fields = ("email", "status")
+
+
 @api.before_first_request
 def create_tables():
     db.create_all()
@@ -147,6 +164,12 @@ def query_all():
         get_reviews = Review.query.all()
         reviews = ReviewSchema(many=True).dump(get_reviews)
         return jsonify(reviews)
+
+    elif table.lower() == 'pendingsmartcontractrequest':
+        get_pendingsmartcontractrequests = PendingSmartContractRequest.query.all()
+        pendingsmartcontractrequests = PendingSmartContractRequestSchema(
+            many=True).dump(get_pendingsmartcontractrequests)
+        return jsonify(pendingsmartcontractrequests)
     else:
         return "ERROR: invalid table name"
 
@@ -154,21 +177,31 @@ def query_all():
 @api.route('/api/db_get/', methods=["GET"])
 def get_record():
     table = request.args.get('table', None)
-    id = request.args.get('id', None)
     if table.lower() == 'entity':
+        id = request.args.get('id', None)
         get_entity = Entity.query.get(id)
         entity = EntitySchema().dump(get_entity)
         return jsonify(entity)
 
     elif table.lower() == 'product':
+        id = request.args.get('id', None)
         get_product = Product.query.get(id)
         product = EntitySchema().dump(get_product)
         return jsonify(product)
 
     elif table.lower() == 'review':
+        id = request.args.get('id', None)
         get_review = Review.query.get(id)
         review = ReviewSchema().dump(get_review)
         return jsonify(review)
+
+    elif table.lower() == 'pendingsmartcontractrequest':
+        email = request.args.get('email', None)
+        get_pendingsmartcontractrequest = PendingSmartContractRequest.query.get(
+            email)
+        pendingsmartcontractrequest = PendingSmartContractRequestSchema().dump(
+            get_pendingsmartcontractrequest)
+        return jsonify(pendingsmartcontractrequest)
 
     else:
         return "ERROR: invalid table name or id"
@@ -227,6 +260,15 @@ def create_record():
         db.session.add(review)
         db.session.commit()
         return "Successfully added review"
+
+    elif table.lower() == 'pendingsmartcontractrequest':
+        email = request.args.get('email', None)
+        status = 'Pending'
+        pendingsmartcontractrequest = PendingSmartContractRequest(email=email,
+                                                                  status=status)
+        db.session.add(pendingsmartcontractrequest)
+        db.session.commit()
+        return "Successfully added a smart contract request"
 
     else:
         return "ERROR: invalid table name"
@@ -644,6 +686,6 @@ def get_verified(params_data):
 
 
 if __name__ == '__main__':
-    # create_tables()
+    create_tables()
     # modify_table()
     api.run()

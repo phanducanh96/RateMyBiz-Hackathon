@@ -1,17 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from "react-router-dom";
 import axios from 'axios';
-import { ProgressBar } from 'react-bootstrap';
+import { ProgressBar, Alert } from 'react-bootstrap';
 import { PROFILE_DETAIL_ABI } from '../../contracts-config';
 import Web3 from 'web3';
 import { useAuth } from '../contexts/AuthContext';
+import { createNew } from '../utils/Utils';
 
 export default function PublicProfile() {
     const [displayScore, setDisplayScore] = useState(0);
     const [reviewGivens, setReviewGivens] = useState([]);
     const [receivedReviews, setReceivedReviews] = useState([]);
+    const [smartContractAddress, setSmartContractAddress] = useState(0);
+    const [pendingRequest, setPendingRequest] = useState();
     const [entityData, setEntityData] = useState();
     const [avatar, setAvatar] = useState();
+    const [requestSubmit, setRequestSubmit] = useState();
     const location = useLocation();
     const { currentUser } = useAuth();
 
@@ -58,7 +62,11 @@ export default function PublicProfile() {
             }).then((response) => {
                 console.log(response.data);
                 const res = response.data;
-                return (res.smart_contract);
+                if (!res.smart_contract) {
+                    return 0
+                } else {
+                    return (res.smart_contract);
+                }
             }).catch((error) => {
                 if (error.response) {
                     console.log(error.response);
@@ -66,6 +74,8 @@ export default function PublicProfile() {
                     console.log(error.response.headers);
                 }
             });
+
+            setSmartContractAddress(smartContractAddress);
 
             const loadProfilePic =
                 await axios({
@@ -93,33 +103,58 @@ export default function PublicProfile() {
                 setAvatar();
             }
 
-            const web3 = new Web3(Web3.givenProvider || "http://localhost:8545");
-            await window.ethereum.enable();
-            const profileDetail = new web3.eth.Contract(PROFILE_DETAIL_ABI, smartContractAddress);
-            const reviewReceivedCount = await profileDetail.methods.reviewReceivedCount().call();
-            const reviewGivenCount = await profileDetail.methods.reviewGivenCount().call();
-            const displayScore = await profileDetail.methods.displayScore().call();
-            setDisplayScore(displayScore);
+            if (smartContractAddress != 0) {
+                const web3 = new Web3(Web3.givenProvider || "http://localhost:8545");
+                await window.ethereum.enable();
+                const profileDetail = new web3.eth.Contract(PROFILE_DETAIL_ABI, smartContractAddress);
+                const reviewReceivedCount = await profileDetail.methods.reviewReceivedCount().call();
+                const reviewGivenCount = await profileDetail.methods.reviewGivenCount().call();
+                const displayScore = await profileDetail.methods.displayScore().call();
+                setDisplayScore(displayScore);
 
-            const tempReviewGivens = [];
-            for (var i = 1; i <= reviewGivenCount; i++) {
-                const reviewGiven = await profileDetail.methods.reviewGivens(i).call();
-                tempReviewGivens.push(reviewGiven);
+                const tempReviewGivens = [];
+                for (var i = 1; i <= reviewGivenCount; i++) {
+                    const reviewGiven = await profileDetail.methods.reviewGivens(i).call();
+                    tempReviewGivens.push(reviewGiven);
+                }
+
+                setReviewGivens(tempReviewGivens);
+                console.log("Given Reviews:");
+                console.log(reviewGivens);
+
+                const tempReceivedReview = [];
+                for (var i = 1; i <= reviewReceivedCount; i++) {
+                    const receivedReview = await profileDetail.methods.receivedReviews(i).call();
+                    tempReceivedReview.push(receivedReview);
+                }
+
+                setReceivedReviews(tempReceivedReview);
+                console.log("Received Reviews:");
+                console.log(receivedReviews);
+            } else {
+
+                const pendingRequest = await axios({
+                    method: 'get',
+                    url: '/api/db_get/',
+                    params: { 'table': 'pendingsmartcontractrequest', 'email': currentUser.email },
+                }).then((response) => {
+                    console.log(response.data);
+                    return (response.data);
+                }).catch((error) => {
+                    if (error.response) {
+                        console.log("Errorrrr")
+                        console.log(error.response);
+                        console.log(error.response.status);
+                        console.log(error.response.headers);
+                    }
+                });
+
+                if (pendingRequest.status != undefined) {
+                    setPendingRequest(pendingRequest);
+                    setRequestSubmit('Smart Contract is requested');
+                }
+
             }
-
-            setReviewGivens(tempReviewGivens);
-            console.log("Given Reviews:");
-            console.log(reviewGivens);
-
-            const tempReceivedReview = [];
-            for (var i = 1; i <= reviewReceivedCount; i++) {
-                const receivedReview = await profileDetail.methods.receivedReviews(i).call();
-                tempReceivedReview.push(receivedReview);
-            }
-
-            setReceivedReviews(tempReceivedReview);
-            console.log("Received Reviews:");
-            console.log(receivedReviews);
         }
         loadBlockchainDataView();
     }, [location]);
@@ -129,6 +164,48 @@ export default function PublicProfile() {
             avatar && URL.revokeObjectURL(avatar.preview);
         }
     }, [avatar]);
+
+    async function handleSubmitRequest(event) {
+        event.preventDefault();
+
+        try {
+            const params = { table: 'pendingsmartcontractrequest', email: currentUser.email };
+            await createNew(params);
+            setRequestSubmit('Smart Contract is requested');
+
+        } catch {
+            setRequestSubmit();
+        }
+
+    }
+
+    function requestComponent() {
+
+        if (requestSubmit) {
+            return (
+                <div className="col-12 grid-margin stretch-card">
+                    <div className="card">
+                        <div className="card-body">
+                            {requestSubmit && <Alert variant="success">{requestSubmit}</Alert>}
+                        </div>
+                    </div>
+                </div >
+            )
+        } else {
+            return (
+                <div className="col-12 grid-margin stretch-card">
+                    <div className="card">
+                        <div className="card-body">
+                            <h4 className="card-title">Request A Smart Contract</h4>
+                            <form className="forms-sample" onSubmit={handleSubmitRequest}>
+                                <button type="submit" className="btn btn-primary mr-2">Submit</button>
+                            </form>
+                        </div>
+                    </div>
+                </div >
+            )
+        }
+    }
 
     return (
         <div>
@@ -248,7 +325,7 @@ export default function PublicProfile() {
                     </div>
                 </div>
             </div >
-
+            {smartContractAddress === 0 && requestComponent()}
         </div >
 
     )
