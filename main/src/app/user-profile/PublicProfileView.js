@@ -78,33 +78,36 @@ export default function PublicProfileView() {
                 setAvatar();
             }
 
-            const web3 = new Web3(Web3.givenProvider || "http://localhost:8545");
-            await window.ethereum.enable();
-            const profileDetail = new web3.eth.Contract(PROFILE_DETAIL_ABI, smartContractAddress);
-            const reviewReceivedCount = await profileDetail.methods.reviewReceivedCount().call();
-            const reviewGivenCount = await profileDetail.methods.reviewGivenCount().call();
-            const displayScore = await profileDetail.methods.displayScore().call();
-            setDisplayScore(displayScore);
+            if (smartContractAddress != 0) {
+                const web3 = new Web3(Web3.givenProvider || "http://localhost:8545");
+                await window.ethereum.enable();
+                const profileDetail = new web3.eth.Contract(PROFILE_DETAIL_ABI, smartContractAddress);
+                const reviewReceivedCount = await profileDetail.methods.reviewReceivedCount().call();
+                const reviewGivenCount = await profileDetail.methods.reviewGivenCount().call();
+                const displayScore = await profileDetail.methods.displayScore().call();
+                setDisplayScore(displayScore);
 
-            const tempReviewGivens = [];
-            for (var i = 1; i <= reviewGivenCount; i++) {
-                const reviewGiven = await profileDetail.methods.reviewGivens(i).call();
-                tempReviewGivens.push(reviewGiven);
+                const tempReviewGivens = [];
+                for (var i = 1; i <= reviewGivenCount; i++) {
+                    const reviewGiven = await profileDetail.methods.reviewGivens(i).call();
+                    tempReviewGivens.push(reviewGiven);
+                }
+
+                setReviewGivens(tempReviewGivens);
+                console.log("Given Reviews:");
+                console.log(reviewGivens);
+
+                const tempReceivedReview = [];
+                for (var i = 1; i <= reviewReceivedCount; i++) {
+                    const receivedReview = await profileDetail.methods.receivedReviews(i).call();
+                    tempReceivedReview.push(receivedReview);
+                }
+
+                setReceivedReviews(tempReceivedReview);
+                console.log("Received Reviews:");
+                console.log(receivedReviews);
             }
 
-            setReviewGivens(tempReviewGivens);
-            console.log("Given Reviews:");
-            console.log(reviewGivens);
-
-            const tempReceivedReview = [];
-            for (var i = 1; i <= reviewReceivedCount; i++) {
-                const receivedReview = await profileDetail.methods.receivedReviews(i).call();
-                tempReceivedReview.push(receivedReview);
-            }
-
-            setReceivedReviews(tempReceivedReview);
-            console.log("Received Reviews:");
-            console.log(receivedReviews);
         }
         loadBlockchainDataView();
     }, [location]);

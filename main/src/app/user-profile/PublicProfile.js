@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import axios from 'axios';
 import { ProgressBar, Alert } from 'react-bootstrap';
 import { PROFILE_DETAIL_ABI } from '../../contracts-config';
@@ -16,11 +16,10 @@ export default function PublicProfile() {
     const [entityData, setEntityData] = useState();
     const [avatar, setAvatar] = useState();
     const [requestSubmit, setRequestSubmit] = useState();
-    const location = useLocation();
     const { currentUser } = useAuth();
 
     useEffect(() => {
-        console.log(location.state);
+
         const loadBlockchainDataView = async () => {
             const currentUserId = await axios({
                 method: 'get',
@@ -157,7 +156,7 @@ export default function PublicProfile() {
             }
         }
         loadBlockchainDataView();
-    }, [location]);
+    }, []);
 
     useEffect(() => {
         return () => {

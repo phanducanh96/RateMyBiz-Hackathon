@@ -42,7 +42,11 @@ const useFetchBlockchainData = () => {
             }).then((response) => {
                 console.log(response.data);
                 const res = response.data;
-                return (res.smart_contract);
+                if (!res.smart_contract) {
+                    return 0
+                } else {
+                    return (res.smart_contract);
+                }
             }).catch((error) => {
                 if (error.response) {
                     console.log(error.response);
@@ -70,38 +74,40 @@ const useFetchBlockchainData = () => {
                 }
             });
 
-            const web3 = new Web3(Web3.givenProvider || "http://localhost:8545");
-            await window.ethereum.enable();
-            const accounts = await web3.eth.getAccounts();
-            setAccount(accounts[0]);
-            const profileDetail = new web3.eth.Contract(PROFILE_DETAIL_ABI, smartContractAddress);
-            setProfileDetail(profileDetail);
-            const reviewReceivedCount = await profileDetail.methods.reviewReceivedCount().call();
-            const reviewGivenCount = await profileDetail.methods.reviewGivenCount().call();
-            const displayScore = await profileDetail.methods.displayScore().call();
-            setDisplayScore(displayScore);
-            const params = { table: "entity", id: currentUserId, total_score: displayScore };
-            updateRecord(params);
+            if (smartContractAddress != 0) {
+                const web3 = new Web3(Web3.givenProvider || "http://localhost:8545");
+                await window.ethereum.enable();
+                const accounts = await web3.eth.getAccounts();
+                setAccount(accounts[0]);
+                const profileDetail = new web3.eth.Contract(PROFILE_DETAIL_ABI, smartContractAddress);
+                setProfileDetail(profileDetail);
+                const reviewReceivedCount = await profileDetail.methods.reviewReceivedCount().call();
+                const reviewGivenCount = await profileDetail.methods.reviewGivenCount().call();
+                const displayScore = await profileDetail.methods.displayScore().call();
+                setDisplayScore(displayScore);
+                const params = { table: "entity", id: currentUserId, total_score: displayScore };
+                updateRecord(params);
 
-            const tempReviewGivens = [];
-            for (var i = 1; i <= reviewGivenCount; i++) {
-                const reviewGiven = await profileDetail.methods.reviewGivens(i).call();
-                tempReviewGivens.push(reviewGiven);
+                const tempReviewGivens = [];
+                for (var i = 1; i <= reviewGivenCount; i++) {
+                    const reviewGiven = await profileDetail.methods.reviewGivens(i).call();
+                    tempReviewGivens.push(reviewGiven);
+                }
+
+                setReviewGivens(tempReviewGivens);
+                console.log("Given Reviews:");
+                console.log(reviewGivens);
+
+                const tempReceivedReview = [];
+                for (var i = 1; i <= reviewReceivedCount; i++) {
+                    const receivedReview = await profileDetail.methods.receivedReviews(i).call();
+                    tempReceivedReview.push(receivedReview);
+                }
+
+                setReceivedReviews(tempReceivedReview);
+                console.log("Received Reviews:");
+                console.log(receivedReviews);
             }
-
-            setReviewGivens(tempReviewGivens);
-            console.log("Given Reviews:");
-            console.log(reviewGivens);
-
-            const tempReceivedReview = [];
-            for (var i = 1; i <= reviewReceivedCount; i++) {
-                const receivedReview = await profileDetail.methods.receivedReviews(i).call();
-                tempReceivedReview.push(receivedReview);
-            }
-
-            setReceivedReviews(tempReceivedReview);
-            console.log("Received Reviews:");
-            console.log(receivedReviews);
 
         }
 

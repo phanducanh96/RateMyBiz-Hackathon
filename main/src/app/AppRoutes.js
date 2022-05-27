@@ -24,7 +24,7 @@ const Error500 = lazy(() => import('./error-pages/Error500'));
 
 const Login = lazy(() => import('./user-pages/Login'));
 const Register = lazy(() => import('./user-pages/Register'));
-const Profile = lazy(() => import('./user-profile/Profile'));
+const ReviewPage = lazy(() => import('./user-profile/ReviewPage'));
 const PublicProfile = lazy(() => import('./user-profile/PublicProfile'));
 const PublicProfileView = lazy(() => import('./user-profile/PublicProfileView'));
 
@@ -58,7 +58,7 @@ class AppRoutes extends Component {
 
           <Route path="/login" component={Login} />
           <Route path="/signup" component={Register} />
-          <Route path="/profile" component={Profile} />
+          <Route path="/review-page" component={ReviewPage} />
           <Route path="/public-profile" component={PublicProfile} />
           <Route path="/public-profile-view" component={PublicProfileView} />
 
