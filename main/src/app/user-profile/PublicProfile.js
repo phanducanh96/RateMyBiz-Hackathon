@@ -95,7 +95,7 @@ export default function PublicProfile() {
                         console.log(error.response.headers)
                     }
                 });
-            if (loadProfilePic != undefined || loadProfilePic.size != 0) {
+            if (loadProfilePic.size != 0) {
                 loadProfilePic.preview = URL.createObjectURL(loadProfilePic);
                 setAvatar(loadProfilePic);
             } else {
