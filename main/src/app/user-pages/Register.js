@@ -55,6 +55,9 @@ export default function Register() {
       await signup(emailRef.current.value, passwordRef.current.value);
       const params = { table: "entity", email: emailRef.current.value, password: passwordRef.current.value, name: nameRef.current.value, type: accountTypeValue, about: '', smart_contract: '', total_score: 0 };
       await createNew(params);
+      const params2 = { table: "entityprofilepic" }
+      await createNew(params2);
+
       history.push('/dashboard-index')
     } catch {
       setError('Failed to create an account')
@@ -112,7 +115,7 @@ export default function Register() {
                   <Form.Group className="form-check">
 
                     <Form.Label className="form-check-label text-muted">
-                      <Form.Control type="checkbox" className="form-check-input" />
+                      <Form.Control type="checkbox" className="form-check-input" required />
                       <i className="input-helper"></i>
                       I agree to all Terms & Conditions
                     </Form.Label>

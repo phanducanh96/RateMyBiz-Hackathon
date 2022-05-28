@@ -23,7 +23,7 @@ class Entity(db.Model):
     password = db.Column(db.String(50), nullable=False)
     # Either Customer or Business
     type = db.Column(db.String(20), nullable=False)
-    smart_contract = db.Column(db.String(200), unique=True)
+    smart_contract = db.Column(db.String(200), nullable=True)
     total_score = db.Column(db.Integer, nullable=False)
     date_created = db.Column(
         db.DateTime, default=datetime.utcnow(), nullable=True)
@@ -368,6 +368,12 @@ def delete_record():
         db.session.commit()
         return "Successfully deleted Review"
 
+    elif table.lower() == 'entityprofilepic':
+        record = EntityProfilePic.query.get(id)
+        db.session.delete(record)
+        db.session.commit()
+        return "Successfully deleted Review"
+
     else:
         return "ERROR: invalid table name"
 
@@ -686,6 +692,7 @@ def get_verified(params_data):
 
 
 if __name__ == '__main__':
-    create_tables()
+    # create_tables()
     # modify_table()
+
     api.run()
