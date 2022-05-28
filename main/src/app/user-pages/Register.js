@@ -2,7 +2,6 @@ import React, { useRef, useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import { Form, Button, Alert } from 'react-bootstrap';
 import { useAuth } from '../contexts/AuthContext';
-import { createNew } from '../utils/Utils';
 import axios from 'axios';
 
 export default function Register() {
@@ -54,11 +53,53 @@ export default function Register() {
       setLoading(true);
       await signup(emailRef.current.value, passwordRef.current.value);
       const params = { table: "entity", email: emailRef.current.value, password: passwordRef.current.value, name: nameRef.current.value, type: accountTypeValue, about: '', smart_contract: '', total_score: 0 };
-      await createNew(params);
-      const params2 = { table: "entityprofilepic" }
-      await createNew(params2);
 
-      history.push('/dashboard-index')
+      const entityResponse = await axios({
+        method: 'post',
+        url: '/api/db_create/',
+        params: params
+      }).then((response) => {
+        console.log(response.data)
+        return "success"
+      }).catch((error) => {
+        if (error.response) {
+          console.log(error.response)
+          console.log(error.response.status)
+          console.log(error.response.headers)
+          return "fail"
+        }
+      });
+
+      if (entityResponse == "success") {
+
+        const params2 = { table: "entityprofilepic" }
+        const profilePicResponse = await axios({
+          method: 'post',
+          url: '/api/db_create/',
+          params: params2
+        }).then((response) => {
+          console.log(response.data)
+          return "success"
+        }).catch((error) => {
+          if (error.response) {
+            console.log(error.response)
+            console.log(error.response.status)
+            console.log(error.response.headers)
+            return "fail"
+          }
+        });
+
+        if (profilePicResponse == "success") {
+          history.push('/dashboard-index');
+        } else {
+          setError('Failed to create an account')
+        }
+
+      } else {
+        setError('Failed to create an account')
+      }
+
+
     } catch {
       setError('Failed to create an account')
     }
