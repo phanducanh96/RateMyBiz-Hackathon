@@ -8,7 +8,9 @@ Ethically stored and secured personal/business information using the blockchain.
 ---
 ## Project Status
 The project is currently heavily under development; therefore, it can be run in a local environment only.
+
 Video Demo the first prototype: https://youtu.be/ZKZd1N8ZMTE
+
 Video Demo the enhancement prototype: https://youtu.be/D1rj7POC-EQ
 
 ---
