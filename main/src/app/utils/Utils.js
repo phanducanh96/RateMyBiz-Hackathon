@@ -1,8 +1,5 @@
 import axios from 'axios';
 
-global.currentUserGlobal = ''
-global.currentIdGlobal = ''
-
 export const readQrCode = (srcQrImg) => {
     axios({
         method: 'get',
@@ -21,26 +18,8 @@ export const readQrCode = (srcQrImg) => {
     });
 }
 
-export const getCurrentId = (email) => {
-    axios({
-        method: 'get',
-        url: '/api/db_get_by_email/',
-        params: { 'email': email },
-    }).then(function (response) {
-        console.log(response.data)
-        global.currentIdGlobal = response.data[0]
-    }).catch(function (error) {
-        if (error.response) {
-            console.log(error.response)
-            console.log(error.response.status)
-            console.log(error.response.headers)
-        }
-    });
-
-}
-
-export const queryTable = (tableName) => {
-    axios({
+export const queryTable = async (tableName) => {
+    await axios({
         method: 'get',
         url: '/api/db_get_all/',
         params: {
@@ -58,8 +37,8 @@ export const queryTable = (tableName) => {
     });
 }
 
-export const getRecord = (tableName, recordId) => {
-    axios({
+export const getRecord = async (tableName, recordId) => {
+    await axios({
         method: 'get',
         url: '/api/db_get/',
         params: {
@@ -78,27 +57,30 @@ export const getRecord = (tableName, recordId) => {
     });
 }
 
-export const createNew = (params) => {
-    axios({
+export const createNew = async (params) => {
+    await axios({
         method: 'post',
         url: '/api/db_create/',
         params: params
     }).then((response) => {
         console.log(response.data)
+        return "success";
         // Display data
     }).catch((error) => {
         if (error.response) {
             console.log(error.response)
             console.log(error.response.status)
             console.log(error.response.headers)
+            return "fail";
         }
     });
 }
 
-export const updateRecord = (params) => {
-    axios({
+export const updateRecord = async (params) => {
+    await axios({
         method: 'post',
         url: '/api/db_edit/',
+        headers: { "Content-Type": "multipart/form-data" },
         params: params
     }).then((response) => {
         console.log(response.data)
@@ -112,8 +94,8 @@ export const updateRecord = (params) => {
     });
 }
 
-export const deleteRecord = (params) => {
-    axios({
+export const deleteRecord = async (params) => {
+    await axios({
         method: 'post',
         url: '/api/db_delete/',
         params: params

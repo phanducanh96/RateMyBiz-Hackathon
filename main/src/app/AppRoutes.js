@@ -24,20 +24,19 @@ const Error500 = lazy(() => import('./error-pages/Error500'));
 
 const Login = lazy(() => import('./user-pages/Login'));
 const Register = lazy(() => import('./user-pages/Register'));
-const Profile = lazy(() => import('./user-profile/Profile'));
+const ReviewPage = lazy(() => import('./user-profile/ReviewPage'));
 const PublicProfile = lazy(() => import('./user-profile/PublicProfile'));
+const PublicProfileView = lazy(() => import('./user-profile/PublicProfileView'));
 
 const QrCode = lazy(() => import('./user-pages/QrCode'));
 const QrReader = lazy(() => import('./user-pages/QrReader'));
 const CredentialOffer = lazy(() => import('./user-pages/CredentialOffer'));
 
-const BusinessProfile = lazy(() => import('./user-pages/BusinessProfile'));
 const PersonalProfile = lazy(() => import('./user-pages/PersonalProfile'));
 
 class AppRoutes extends Component {
 
   render() {
-    console.log("TEST" + this.props.reviewGivens)
     return (
       <Suspense fallback={<Spinner />}>
         <Switch>
@@ -59,8 +58,9 @@ class AppRoutes extends Component {
 
           <Route path="/login" component={Login} />
           <Route path="/signup" component={Register} />
-          <Route path="/profile" component={Profile} />
+          <Route path="/review-page" component={ReviewPage} />
           <Route path="/public-profile" component={PublicProfile} />
+          <Route path="/public-profile-view" component={PublicProfileView} />
 
           <Route path="/qr-code" component={QrCode} />
           <Route path="/qr-reader" component={QrReader} />
@@ -71,7 +71,6 @@ class AppRoutes extends Component {
           <Route path="/error-pages/error-500" component={Error500} />
 
           <Route path="/personal-profile-edit" component={PersonalProfile} />
-          <Route path="/business-profile-edit" component={BusinessProfile} />
 
           <Route path="/dashboard-index" component={DashboardIndex} />
 

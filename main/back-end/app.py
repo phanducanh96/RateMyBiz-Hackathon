@@ -1,7 +1,8 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Response
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from flask_marshmallow import Marshmallow
+from werkzeug.utils import secure_filename
 import requests
 import json
 import sys
@@ -22,7 +23,7 @@ class Entity(db.Model):
     password = db.Column(db.String(50), nullable=False)
     # Either Customer or Business
     type = db.Column(db.String(20), nullable=False)
-    smart_contract = db.Column(db.String(200), unique=True)
+    smart_contract = db.Column(db.String(200), nullable=True)
     total_score = db.Column(db.Integer, nullable=False)
     date_created = db.Column(
         db.DateTime, default=datetime.utcnow(), nullable=True)
@@ -45,6 +46,26 @@ class EntitySchema(ma.Schema):
     class Meta:
         fields = ("id", "name", "email", "password",
                         "type", "smart_contract", "total_score", "date_created", "about")
+
+
+class EntityProfilePic(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.Text, nullable=False)
+    img = db.Column(db.Text, nullable=False)
+    img_type = db.Column(db.Text, nullable=False)
+
+    def __init__(self, img, name, img_type):
+        self.name = name
+        self.img = img
+        self.img_type = img_type
+
+    def __repr__(self):
+        return '<EntityProfilePic %r>' % self.id
+
+
+class EntityProfilePicSchema(ma.Schema):
+    class Meta:
+        fields = ("id", "img", "name", "img_type")
 
 
 class Product(db.Model):
@@ -96,14 +117,39 @@ class ReviewSchema(ma.Schema):
                         "to_entity_id")
 
 
+class PendingSmartContractRequest(db.Model):
+    email = db.Column(db.String(50), primary_key=True)
+    status = db.Column(db.Text, nullable=False)
+
+    def __init__(self, email, status):
+        self.email = email
+        self.status = status
+
+    def __repr__(self):
+        return '<PendingSmartContractRequest %r>' % self.email
+
+
+class PendingSmartContractRequestSchema(ma.Schema):
+    class Meta:
+        fields = ("email", "status")
+
+
 @api.before_first_request
 def create_tables():
     db.create_all()
 
 
+def modify_table():
+    # db.session.execute(
+    #     "ALTER TABLE entity add column profile_img_data LargeBinary")
+    db.session.execute(
+        "ALTER TABLE entity drop column profile_img_data")
+
+
 @api.route('/api/db_get_all/', methods=["GET"])
 def query_all():
     table = request.args.get('table', None)
+
     if table.lower() == 'entity':
         get_entities = Entity.query.all()
         entities = EntitySchema(many=True).dump(get_entities)
@@ -118,6 +164,12 @@ def query_all():
         get_reviews = Review.query.all()
         reviews = ReviewSchema(many=True).dump(get_reviews)
         return jsonify(reviews)
+
+    elif table.lower() == 'pendingsmartcontractrequest':
+        get_pendingsmartcontractrequests = PendingSmartContractRequest.query.all()
+        pendingsmartcontractrequests = PendingSmartContractRequestSchema(
+            many=True).dump(get_pendingsmartcontractrequests)
+        return jsonify(pendingsmartcontractrequests)
     else:
         return "ERROR: invalid table name"
 
@@ -125,21 +177,31 @@ def query_all():
 @api.route('/api/db_get/', methods=["GET"])
 def get_record():
     table = request.args.get('table', None)
-    id = request.args.get('id', None)
     if table.lower() == 'entity':
+        id = request.args.get('id', None)
         get_entity = Entity.query.get(id)
         entity = EntitySchema().dump(get_entity)
         return jsonify(entity)
 
     elif table.lower() == 'product':
+        id = request.args.get('id', None)
         get_product = Product.query.get(id)
         product = EntitySchema().dump(get_product)
         return jsonify(product)
 
     elif table.lower() == 'review':
+        id = request.args.get('id', None)
         get_review = Review.query.get(id)
         review = ReviewSchema().dump(get_review)
         return jsonify(review)
+
+    elif table.lower() == 'pendingsmartcontractrequest':
+        email = request.args.get('email', None)
+        get_pendingsmartcontractrequest = PendingSmartContractRequest.query.get(
+            email)
+        pendingsmartcontractrequest = PendingSmartContractRequestSchema().dump(
+            get_pendingsmartcontractrequest)
+        return jsonify(pendingsmartcontractrequest)
 
     else:
         return "ERROR: invalid table name or id"
@@ -163,6 +225,15 @@ def create_record():
         db.session.commit()
 
         return "Successfully added entity"
+
+    elif table.lower() == 'entityprofilepic':
+
+        entity_pic = EntityProfilePic('', '', '')
+
+        db.session.add(entity_pic)
+        db.session.commit()
+
+        return "Successfully added profile pic record"
 
     elif table.lower() == 'product':
         name = request.args.get('name', None)
@@ -189,6 +260,15 @@ def create_record():
         db.session.add(review)
         db.session.commit()
         return "Successfully added review"
+
+    elif table.lower() == 'pendingsmartcontractrequest':
+        email = request.args.get('email', None)
+        status = 'Pending'
+        pendingsmartcontractrequest = PendingSmartContractRequest(email=email,
+                                                                  status=status)
+        db.session.add(pendingsmartcontractrequest)
+        db.session.commit()
+        return "Successfully added a smart contract request"
 
     else:
         return "ERROR: invalid table name"
@@ -233,6 +313,38 @@ def edit_record():
         return "ERROR: invalid table name"
 
 
+@api.route('/api/db_edit_pic/', methods=['POST'])
+def edit_profile_pic():
+    id = request.args.get('id')
+    record = EntityProfilePic.query.get_or_404(id)
+    print("Hello")
+    pic = request.files['pic']
+    print(pic)
+    if not pic:
+        return 'No pic uploaded', 400
+
+    name = secure_filename(pic.filename)
+    img_type = pic.mimetype
+
+    setattr(record, 'name', name)
+    setattr(record, 'img', pic.read())
+    setattr(record, 'img_type', img_type)
+
+    db.session.commit()
+    return "Successfully updated Profile Pic"
+
+
+@api.route('/api/db_get_pic/', methods=['GET'])
+def get_profile_pic():
+    id = request.args.get('id')
+    img = EntityProfilePic.query.filter_by(id=id).first()
+
+    if not img:
+        return 'No Profile Pic with this id', 404
+
+    return Response(img.img, mimetype=img.img_type)
+
+
 @api.route('/api/db_delete/', methods=['POST'])
 def delete_record():
     table = request.args.get('table')
@@ -252,6 +364,12 @@ def delete_record():
 
     elif table.lower() == 'review':
         record = Review.query.get(id)
+        db.session.delete(record)
+        db.session.commit()
+        return "Successfully deleted Review"
+
+    elif table.lower() == 'entityprofilepic':
+        record = EntityProfilePic.query.get(id)
         db.session.delete(record)
         db.session.commit()
         return "Successfully deleted Review"
@@ -575,4 +693,6 @@ def get_verified(params_data):
 
 if __name__ == '__main__':
     # create_tables()
+    # modify_table()
+
     api.run()

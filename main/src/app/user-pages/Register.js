@@ -1,29 +1,105 @@
 import React, { useRef, useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
-import { Form, Button, Alert } from 'react-bootstrap'
-import { useAuth } from '../contexts/AuthContext'
+import { Form, Button, Alert } from 'react-bootstrap';
+import { useAuth } from '../contexts/AuthContext';
+import axios from 'axios';
 
 export default function Register() {
-  const emailRef = useRef()
-  const passwordRef = useRef()
-  const passwordConfirmRef = useRef()
-  const { signup } = useAuth()
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
-  const history = useHistory()
+  const nameRef = useRef();
+  const [accountTypeValue, setAccountTypeValue] = useState('Business');
+  const emailRef = useRef();
+  const passwordRef = useRef();
+  const passwordConfirmRef = useRef();
+  const { signup } = useAuth();
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const history = useHistory();
+
+  const accountTypes = [
+    { id: 1, type: 'Business' },
+    { id: 2, type: 'Customer' }
+  ];
 
   async function handleSubmit(e) {
-    e.preventDefault()
+    e.preventDefault();
 
     if (passwordRef.current.value !== passwordConfirmRef.current.value) {
-      return setError('Passwords do not match!')
+      return setError('Passwords do not match!');
+    }
+
+    const entityData = await axios({
+      method: 'get',
+      url: '/api/db_get_entity_by_name/',
+      params: {
+        name: nameRef.current.value
+      }
+    }).then((response) => {
+      const entityData = response.data;
+      return entityData;
+    }).catch((error) => {
+      if (error.response) {
+        console.log(error.response);
+        console.log(error.response.status);
+        console.log(error.response.headers);
+      }
+    });
+
+    if (entityData[0]) {
+      return setError('Name is already in use');
     }
 
     try {
-      setError('')
-      setLoading(true)
-      await signup(emailRef.current.value, passwordRef.current.value)
-      history.push('/dashboard-index')
+      setError('');
+      setLoading(true);
+      await signup(emailRef.current.value, passwordRef.current.value);
+      const params = { table: "entity", email: emailRef.current.value, password: passwordRef.current.value, name: nameRef.current.value, type: accountTypeValue, about: '', smart_contract: '', total_score: 0 };
+
+      const entityResponse = await axios({
+        method: 'post',
+        url: '/api/db_create/',
+        params: params
+      }).then((response) => {
+        console.log(response.data)
+        return "success"
+      }).catch((error) => {
+        if (error.response) {
+          console.log(error.response)
+          console.log(error.response.status)
+          console.log(error.response.headers)
+          return "fail"
+        }
+      });
+
+      if (entityResponse == "success") {
+
+        const params2 = { table: "entityprofilepic" }
+        const profilePicResponse = await axios({
+          method: 'post',
+          url: '/api/db_create/',
+          params: params2
+        }).then((response) => {
+          console.log(response.data)
+          return "success"
+        }).catch((error) => {
+          if (error.response) {
+            console.log(error.response)
+            console.log(error.response.status)
+            console.log(error.response.headers)
+            return "fail"
+          }
+        });
+
+        if (profilePicResponse == "success") {
+          history.push('/dashboard-index');
+        } else {
+          setError('Failed to create an account')
+        }
+
+      } else {
+        setError('Failed to create an account')
+      }
+
+
     } catch {
       setError('Failed to create an account')
     }
@@ -32,6 +108,9 @@ export default function Register() {
 
   }
 
+  const handleSelect = (value) => {
+    setAccountTypeValue(value)
+  };
   return (
     <div>
       <div className="d-flex align-items-center auth px-0">
@@ -45,24 +124,25 @@ export default function Register() {
               <Form className="pt-3" onSubmit={handleSubmit}>
 
                 {error && <Alert variant="danger">{error}</Alert>}
+
+                <Form.Group>
+                  <Form.Control type="text" className="form-control" id="inputName" placeholder="Name" ref={nameRef} required />
+                </Form.Group>
+
+                <Form.Group>
+                  <select className="form-control" id="SelectAccountType" value={accountTypeValue} onChange={event => handleSelect(event.target.value)}>
+                    {accountTypes.map((accountType, key) => {
+                      return (
+                        <option key={accountType.id} value={accountType.type}>Type: {accountType.type}</option>
+                      )
+                    })}
+                  </select>
+
+                </Form.Group>
+
                 <Form.Group className="form-group">
                   <Form.Control type="email" className="form-control form-control-lg" id="InputEmail" placeholder="Email" ref={emailRef} required />
                 </Form.Group>
-
-                {/* <Form.Group className="form-group">
-                    <Form.Control type="text" className="form-control form-control-lg" id="InputUserName" placeholder="Username"  ref={userNameRef} required/>
-                  </Form.Group> */}
-
-                {/* <div className="form-group">
-                    <select className="form-control form-control-lg" id="exampleFormControlSelect2">
-                      <option>Country</option>
-                      <option>United States of America</option>
-                      <option>United Kingdom</option>
-                      <option>India</option>
-                      <option>Germany</option>
-                      <option>Argentina</option>
-                    </select>
-                  </div> */}
 
                 <Form.Group className="form-group">
                   <Form.Control type="password" className="form-control form-control-lg" id="InputPassword" placeholder="Password" ref={passwordRef} required />
@@ -76,7 +156,7 @@ export default function Register() {
                   <Form.Group className="form-check">
 
                     <Form.Label className="form-check-label text-muted">
-                      <Form.Control type="checkbox" className="form-check-input" />
+                      <Form.Control type="checkbox" className="form-check-input" required />
                       <i className="input-helper"></i>
                       I agree to all Terms & Conditions
                     </Form.Label>

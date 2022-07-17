@@ -1,49 +1,31 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import axios from 'axios';
-import { ProgressBar, Alert } from 'react-bootstrap';
+import { ProgressBar } from 'react-bootstrap';
 import { PROFILE_DETAIL_ABI } from '../../contracts-config';
 import Web3 from 'web3';
-import { useAuth } from '../contexts/AuthContext';
-import { createNew } from '../utils/Utils';
 
-export default function PublicProfile() {
+export default function PublicProfileView() {
+
     const [displayScore, setDisplayScore] = useState(0);
     const [reviewGivens, setReviewGivens] = useState([]);
     const [receivedReviews, setReceivedReviews] = useState([]);
-    const [smartContractAddress, setSmartContractAddress] = useState(0);
-    const [pendingRequest, setPendingRequest] = useState();
     const [entityData, setEntityData] = useState();
     const [avatar, setAvatar] = useState();
-    const [requestSubmit, setRequestSubmit] = useState();
-    const { currentUser } = useAuth();
+    const location = useLocation();
 
     useEffect(() => {
-
+        console.log(location.state);
         const loadBlockchainDataView = async () => {
-            const currentUserId = await axios({
-                method: 'get',
-                url: '/api/db_get_by_email/',
-                params: { 'email': currentUser.email },
-            }).then((response) => {
-                console.log(response.data);
-                return (response.data[0]);
-            }).catch((error) => {
-                if (error.response) {
-                    console.log(error.response);
-                    console.log(error.response.status);
-                    console.log(error.response.headers);
-                }
-            });
-
-
             const entityData = await axios({
                 method: 'get',
-                url: '/api/db_get/',
-                params: { 'table': 'entity', 'id': currentUserId }
+                url: '/api/db_get_entity_by_name/',
+                params: {
+                    name: location.state
+                }
             }).then((response) => {
-                console.log(response.data);
-                return response.data;
+                const entityData = response.data;
+                return entityData;
             }).catch((error) => {
                 if (error.response) {
                     console.log(error.response);
@@ -51,21 +33,17 @@ export default function PublicProfile() {
                     console.log(error.response.headers);
                 }
             });
-
+            console.log(entityData[0].id);
             setEntityData(entityData);
 
             const smartContractAddress = await axios({
                 method: 'get',
                 url: '/api/db_get/',
-                params: { 'table': 'entity', 'id': entityData.id }
+                params: { 'table': 'entity', 'id': entityData[0].id }
             }).then((response) => {
                 console.log(response.data);
                 const res = response.data;
-                if (!res.smart_contract) {
-                    return 0
-                } else {
-                    return (res.smart_contract);
-                }
+                return (res.smart_contract);
             }).catch((error) => {
                 if (error.response) {
                     console.log(error.response);
@@ -73,15 +51,13 @@ export default function PublicProfile() {
                     console.log(error.response.headers);
                 }
             });
-
-            setSmartContractAddress(smartContractAddress);
 
             const loadProfilePic =
                 await axios({
                     method: 'get',
                     url: '/api/db_get_pic/',
                     params: {
-                        id: entityData.id
+                        id: entityData[0].id
                     },
                     responseType: 'blob'
                 }).then((response) => {
@@ -130,81 +106,17 @@ export default function PublicProfile() {
                 setReceivedReviews(tempReceivedReview);
                 console.log("Received Reviews:");
                 console.log(receivedReviews);
-            } else {
-
-                const pendingRequest = await axios({
-                    method: 'get',
-                    url: '/api/db_get/',
-                    params: { 'table': 'pendingsmartcontractrequest', 'email': currentUser.email },
-                }).then((response) => {
-                    console.log(response.data);
-                    return (response.data);
-                }).catch((error) => {
-                    if (error.response) {
-                        console.log("Errorrrr")
-                        console.log(error.response);
-                        console.log(error.response.status);
-                        console.log(error.response.headers);
-                    }
-                });
-
-                if (pendingRequest.status != undefined) {
-                    setPendingRequest(pendingRequest);
-                    setRequestSubmit('Smart Contract is requested');
-                }
-
             }
+
         }
         loadBlockchainDataView();
-    }, []);
+    }, [location]);
 
     useEffect(() => {
         return () => {
             avatar && URL.revokeObjectURL(avatar.preview);
         }
     }, [avatar]);
-
-    async function handleSubmitRequest(event) {
-        event.preventDefault();
-
-        try {
-            const params = { table: 'pendingsmartcontractrequest', email: currentUser.email };
-            await createNew(params);
-            setRequestSubmit('Smart Contract is requested');
-
-        } catch {
-            setRequestSubmit();
-        }
-
-    }
-
-    function requestComponent() {
-
-        if (requestSubmit) {
-            return (
-                <div className="col-12 grid-margin stretch-card">
-                    <div className="card">
-                        <div className="card-body">
-                            {requestSubmit && <Alert variant="success">{requestSubmit}</Alert>}
-                        </div>
-                    </div>
-                </div >
-            )
-        } else {
-            return (
-                <div className="col-12 grid-margin stretch-card">
-                    <div className="card">
-                        <div className="card-body">
-                            <h4 className="card-title">Request A Smart Contract</h4>
-                            <form className="forms-sample" onSubmit={handleSubmitRequest}>
-                                <button type="submit" className="btn btn-primary mr-2">Submit</button>
-                            </form>
-                        </div>
-                    </div>
-                </div >
-            )
-        }
-    }
 
     return (
         <div>
@@ -228,9 +140,9 @@ export default function PublicProfile() {
                             <tbody>
                                 <tr>
                                     <td>
-                                        {entityData && <h4>Name: {entityData.name}</h4>}
-                                        {entityData && <h5>Type: {entityData.type}</h5>}
-                                        {entityData && <h5>Description: {entityData.about}</h5>}
+                                        {entityData && <h4>Name: {entityData[0].name}</h4>}
+                                        {entityData && <h5>Type: {entityData[0].type}</h5>}
+                                        {entityData && <h5>Description: {entityData[0].about}</h5>}
                                     </td>
                                     <td>
                                         {avatar && (<img src={avatar.preview} />)}
@@ -324,7 +236,6 @@ export default function PublicProfile() {
                     </div>
                 </div>
             </div >
-            {smartContractAddress === 0 && requestComponent()}
         </div >
 
     )
